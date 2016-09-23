@@ -12,11 +12,15 @@ def merge(dct, merge_dct):
     return dct
 
 
-def bundle(files, outp):
-    result = {}
+def transform(result, files):
     for src in files:
         with open(src) as inp:
             data = yaml.load(inp)
             result = merge(result, data)
+    return result
+
+
+def bundle(files, outp):
+    result = transform({}, files)
     ordered = ordering(result)
     yaml.dump(ordered, outp, allow_unicode=True, default_flow_style=False)
