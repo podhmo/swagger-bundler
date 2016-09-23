@@ -12,7 +12,7 @@ def merge(dct, merge_dct):
     return dct
 
 
-def bundle(files, outp, namespace=None):
+def bundle(files, outp):
     result = {}
     for src in files:
         with open(src) as inp:
