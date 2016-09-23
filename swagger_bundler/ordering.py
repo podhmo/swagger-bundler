@@ -2,8 +2,12 @@ import yaml
 from collections import OrderedDict
 
 
+def make_dict():
+    return OrderedDict()
+
+
 def ordering(data):
-    d = OrderedDict()
+    d = make_dict()
     used = set()
     expected = [
         "swagger", "info", "host", "schemes", "basePath", "consumes", "produces",
@@ -28,5 +32,7 @@ def construct_odict(loader, node):
 
 
 def setup():
+    yaml.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+                         lambda loader, node: OrderedDict(loader.construct_pairs(node)))
     yaml.add_representer(OrderedDict, represent_odict)
     yaml.add_constructor(u'tag:yaml.org,2002:map', construct_odict)

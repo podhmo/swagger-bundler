@@ -1,11 +1,7 @@
 # -*- coding:utf-8 -*-
 import yaml
 import sys
-from .ordering import ordering
-
-
-def ordered_items(d):
-    return ((int(k), v) if k.isdigit() else (k, v) for k, v in sorted((str(k), v) for k, v in d.items()))
+from .ordering import ordering, make_dict
 
 
 def transform(data, ns_key="namespace", namespace=None):
@@ -19,8 +15,8 @@ def transform(data, ns_key="namespace", namespace=None):
 
 def _transform(data, namespace, toplevel=False):
     if hasattr(data, "keys"):
-        d = {}
-        for k, v in ordered_items(data):
+        d = make_dict()
+        for k, v in data.items():
             v = data[k]
             if k == "definitions":
                 v = _transform_definitions(v, namespace)
@@ -53,8 +49,8 @@ def _titleize(s):
 
 
 def _transform_definitions(data, namespace):
-    d = {}
-    for k, v in ordered_items(data):
+    d = make_dict()
+    for k, v in data.items():
         d[_transform_ref(k, namespace)] = _transform(v, namespace)
     return d
 

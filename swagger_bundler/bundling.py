@@ -1,5 +1,5 @@
 import yaml
-from .ordering import ordering
+from .ordering import ordering, make_dict
 from collections import Mapping
 
 
@@ -21,6 +21,6 @@ def transform(result, files):
 
 
 def bundle(files, outp):
-    result = transform({}, files)
+    result = transform(make_dict(), files)
     ordered = ordering(result)
     yaml.dump(ordered, outp, allow_unicode=True, default_flow_style=False)
