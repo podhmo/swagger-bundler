@@ -4,13 +4,18 @@ from .ordering import ordering, make_dict
 
 
 # xxx:
-def merge(dct, merge_dct):
+def _merge(dct, merge_dct):
     for k, v in merge_dct.items():
         if (k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], Mapping)):
-            merge(dct[k], merge_dct[k])
+            _merge(dct[k], merge_dct[k])
         else:
             dct[k] = merge_dct[k]
     return dct
+
+
+def merge(x, y):
+    import copy
+    return _merge(copy.deepcopy(x), copy.deepcopy(y))
 
 
 def transform(ctx, result, files):
