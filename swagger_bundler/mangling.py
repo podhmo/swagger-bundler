@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-import yaml
+from . import loading
 import sys
 from .ordering import ordering, make_dict
 
@@ -60,8 +60,8 @@ def _transform_responses(data, namespace):
 
 
 def mangle(inp, outp, namespace=None):
-    data = yaml.load(inp)
+    data = loading.load(inp)
     result = transform(data, namespace=namespace)
     result.pop("namespace", None)
     ordered = ordering(result)
-    yaml.dump(ordered, outp, allow_unicode=True, default_flow_style=False)
+    loading.dump(ordered, outp, allow_unicode=True, default_flow_style=False)

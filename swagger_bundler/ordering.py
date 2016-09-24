@@ -1,4 +1,4 @@
-import yaml
+from . import loading
 from collections import OrderedDict
 
 
