@@ -24,14 +24,17 @@ class Detector:
 
     def scan(self, data):
         # todo: config special marker field
-        candidates = ["bundle", "namespace"]
+        candidates = ["bundle", "namespace", "disable_mangle"]
         return {c: data.pop(c) for c in candidates if c in data}
 
     def detect_bundle(self):
         return self.config.get("bundle") or []
 
     def detect_namespace(self):
-        return self.config.get("namespace") or []
+        return self.config.get("namespace")
+
+    def detect_disable_mangle(self):
+        return self.config.get("disable_mangle") or []
 
 
 class PathResolver:

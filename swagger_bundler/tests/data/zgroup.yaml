@@ -1,0 +1,38 @@
+definitions:
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
+  ZGroup:
+    type: object
+    properties:
+      group_id:
+        type: string
+      name:
+        type: string
+        description: name of group.
+responses:
+  UnexpectedError:
+    description: Unexpected error
+    schema:
+      $ref: '#/definitions/Error'
+paths:
+  /groups:
+    get:
+      summary: group
+      description: group list
+      responses:
+        200:
+          description: An array of groups
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ZGroup'
+        default:
+          $ref: '#/responses/UnexpectedError'
