@@ -1,20 +1,24 @@
 # -*- coding:utf-8 -*-
-import yaml
+from . import loading
 from .ordering import ordering, make_dict
 from . import bundling
 from . import mangling
 
 
-def generate(inp, outp):
-    data = yaml.load(inp)
-    if "bundle" in data:
-        files = data.pop("bundle")
-        additional = bundling.transform(make_dict(), files)
-        additional.pop("bundle", None)
-        additional.pop("namespace", None)
+def transform(ctx, data):
+    subfiles = ctx.detector.detect_bundle()
+    if subfiles:
+        additional = bundling.transform(ctx, make_dict(), subfiles)
         data = bundling.merge(additional, data)
 
-    namespace = data.pop("namespace", None)
-    result = mangling.transform(data, namespace=namespace)
+    namespace = ctx.detector.detect_namespace()
+    if namespace:
+        data = mangling.transform(ctx, data, namespace=namespace)
+    return data
+
+
+def generate(ctx, inp, outp):
+    subcontext = ctx.make_subcontext_from_port(inp)
+    result = transform(subcontext, subcontext.data)
     ordered = ordering(result)
-    yaml.dump(ordered, outp, allow_unicode=True, default_flow_style=False)
+    loading.dump(ordered, outp, allow_unicode=True, default_flow_style=False)

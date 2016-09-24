@@ -1,15 +1,11 @@
 # -*- coding:utf-8 -*-
-import yaml
-import sys
+from . import loading
 from .ordering import ordering, make_dict
 
 
-def transform(data, ns_key="namespace", namespace=None):
+def transform(ctx, data, namespace=None):
     if namespace is None:
-        if ns_key not in data:
-            sys.stderr.write("{} is not found. skipping...\n".format(ns_key))
-            return data
-        namespace = data[ns_key]
+        return data
     return _transform(data, namespace, toplevel=True)
 
 
@@ -59,9 +55,9 @@ def _transform_responses(data, namespace):
     return _transform_definitions(data, namespace)
 
 
-def mangle(inp, outp, namespace=None):
-    data = yaml.load(inp)
-    result = transform(data, namespace=namespace)
-    result.pop("namespace", None)
+def mangle(ctx, inp, outp, namespace=None):
+    subcontext = ctx.make_subcontext_from_port(inp)
+    namespace = namespace or subcontext.detector.detect_name()
+    result = transform(subcontext, subcontext.data, namespace=namespace)
     ordered = ordering(result)
-    yaml.dump(ordered, outp, allow_unicode=True, default_flow_style=False)
+    loading.dump(ordered, outp, allow_unicode=True, default_flow_style=False)

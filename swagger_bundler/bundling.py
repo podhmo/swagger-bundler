@@ -1,8 +1,9 @@
-import yaml
-from .ordering import ordering, make_dict
 from collections import Mapping
+from . import loading
+from .ordering import ordering, make_dict
 
 
+# xxx:
 def merge(dct, merge_dct):
     for k, v in merge_dct.items():
         if (k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], Mapping)):
@@ -12,15 +13,21 @@ def merge(dct, merge_dct):
     return dct
 
 
-def transform(result, files):
+def transform(ctx, result, files):
+    additional = make_dict()
     for src in files:
-        with open(src) as inp:
-            data = yaml.load(inp)
-            result = merge(result, data)
-    return result
+        subcontext = ctx.make_subcontext(src)
+        if subcontext.is_marked():
+            continue
+        additional = merge(additional, subcontext.data)
+        subcontext.mark()
+        subfiles = subcontext.detector.detect_bundle()
+        if subfiles:
+            transform(subcontext, additional, subfiles)
+    return merge(additional, result)
 
 
-def bundle(files, outp):
-    result = transform(make_dict(), files)
+def bundle(ctx, files, outp):
+    result = transform(ctx, make_dict(), files)
     ordered = ordering(result)
-    yaml.dump(ordered, outp, allow_unicode=True, default_flow_style=False)
+    loading.dump(ordered, outp, allow_unicode=True, default_flow_style=False)
