@@ -22,7 +22,6 @@ class Transformer:
     def __init__(self, namespace, disable_mangle_predicate):
         self.namespace = namespace
         self.disable_mangle_predicate = disable_mangle_predicate
-        print(disable_mangle_predicate, "@@")
 
     def transform(self, data, toplevel=False):
         if hasattr(data, "keys"):
@@ -51,7 +50,6 @@ class Transformer:
         for k in ["definitions", "responses"]:
             if "/{}".format(k) in head and tail in self.disable_mangle_predicate[k]:
                 return v
-        print(head, tail, "$$", self.disable_mangle_predicate)
         return "/".join([head, "{}{}".format(self.namespace, _titleize(tail))])
 
     def _transform_name(self, v):
