@@ -2,7 +2,7 @@
 from . import loading
 from .ordering import ordering, make_dict
 from . import bundling
-from . import mangling
+from . import prefixing
 
 
 def transform(ctx, data):
@@ -13,7 +13,7 @@ def transform(ctx, data):
 
     namespace = ctx.detector.detect_namespace()
     if namespace:
-        data = mangling.transform(ctx, data, namespace=namespace)
+        data = prefixing.transform(ctx, data, namespace=namespace)
     return data
 
 

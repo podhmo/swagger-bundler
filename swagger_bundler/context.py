@@ -39,8 +39,8 @@ class Detector:
     def detect_namespace(self):
         return self.config.get("namespace")
 
-    def detect_disable_mangle(self):
-        return self.config.get("disable_mangle") or []
+    def detect_ignore_prefixer(self):
+        return self.config.get("ignore_prefixer") or []
 
 
 class DetectorFactoryFromConfigParser:

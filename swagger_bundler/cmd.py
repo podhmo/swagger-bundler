@@ -4,7 +4,6 @@ import click
 
 from swagger_bundler import make_rootcontext
 from swagger_bundler import config as configuration
-import swagger_bundler.mangling as mangling
 import swagger_bundler.bundling as bundling
 import swagger_bundler.ordering as ordering
 import swagger_bundler.generating as generating
@@ -47,18 +46,6 @@ def config(file, init):
 def bundle(files):
     ctx = _prepare()
     bundling.bundle(ctx, files, sys.stdout)
-
-
-@main.command()
-@click.argument("file", required=False, type=click.Path(exists=True))
-@click.option("--namespace", "-ns", default=None)
-def mangle(file, namespace):
-    ctx = _prepare()
-    if file is None:
-        mangling.mangle(ctx, sys.stdin, sys.stdout, namespace=namespace)
-    else:
-        with open(file) as rf:
-            mangling.mangle(ctx, rf, sys.stdout, namespace=namespace)
 
 
 @main.command(help="generating bundled yaml. (see: namespace and bundle field)")

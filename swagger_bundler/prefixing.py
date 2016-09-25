@@ -3,25 +3,17 @@ from . import loading
 from .ordering import ordering, make_dict
 
 
-def transform(ctx, data, namespace=None):
-    if namespace is None:
-        return data
-
-    disable_mangle_predicate = {"responses": set(), "definitions": set()}
-    for fname in ctx.detector.detect_disable_mangle():
-        path = ctx.resolver.resolve_path(fname)
-        if path in ctx.env:
-            subdata = ctx.env[path].data
-            disable_mangle_predicate["responses"].update(subdata.get("responses", []).keys())
-            disable_mangle_predicate["definitions"].update(subdata.get("definitions", []).keys())
-    transformer = Transformer(namespace, disable_mangle_predicate)
-    return transformer.transform(data, toplevel=True)
+def _titleize(s):
+    return "{}{}".format(s[0].title(), s[1:])
 
 
-class Transformer:
-    def __init__(self, namespace, disable_mangle_predicate):
+class Prefixer:
+    def __init__(self, namespace, ignore_prefixer_predicate):
         self.namespace = namespace
-        self.disable_mangle_predicate = disable_mangle_predicate
+        self.ignore_prefixer_predicate = ignore_prefixer_predicate
+
+    def add_prefix(self, data):
+        return self.transform(data, toplevel=True)
 
     def transform(self, data, toplevel=False):
         if hasattr(data, "keys"):
@@ -46,9 +38,9 @@ class Transformer:
             return v
         head, tail = v.rsplit("/", 1)
 
-        # disable_mangle
+        # ignore_prefixer
         for k in ["definitions", "responses"]:
-            if "/{}".format(k) in head and tail in self.disable_mangle_predicate[k]:
+            if "/{}".format(k) in head and tail in self.ignore_prefixer_predicate[k]:
                 return v
         return "/".join([head, "{}{}".format(self.namespace, _titleize(tail))])
 
@@ -59,9 +51,9 @@ class Transformer:
 
     def _transform_definitions(self, data):
         d = make_dict()
-        disable_mangles = self.disable_mangle_predicate["definitions"]
+        ignore_prefixers = self.ignore_prefixer_predicate["definitions"]
         for k, v in data.items():
-            if k in disable_mangles:
+            if k in ignore_prefixers:
                 d[k] = self.transform(v)
             else:
                 d[self._transform_name(k)] = self.transform(v)
@@ -69,20 +61,32 @@ class Transformer:
 
     def _transform_responses(self, data):
         d = make_dict()
-        disable_mangles = self.disable_mangle_predicate["responses"]
+        ignore_prefixers = self.ignore_prefixer_predicate["responses"]
         for k, v in data.items():
-            if k in disable_mangles:
+            if k in ignore_prefixers:
                 d[k] = self.transform(v)
             else:
                 d[self._transform_name(k)] = self.transform(v)
         return d
 
 
-def _titleize(s):
-    return "{}{}".format(s[0].title(), s[1:])
+def transform(ctx, data, namespace=None):
+    if namespace is None:
+        return data
+
+    ignore_prefixer_predicate = {"responses": set(), "definitions": set()}
+    for fname in ctx.detector.detect_ignore_prefixer():
+        path = ctx.resolver.resolve_path(fname)
+        if path in ctx.env:
+            subdata = ctx.env[path].data
+            ignore_prefixer_predicate["responses"].update(subdata.get("responses", []).keys())
+            ignore_prefixer_predicate["definitions"].update(subdata.get("definitions", []).keys())
+
+    prefixer = Prefixer(namespace, ignore_prefixer_predicate)
+    return prefixer.add_prefix(data)
 
 
-def mangle(ctx, inp, outp, namespace=None):
+def run(ctx, inp, outp, namespace=None):
     subcontext = ctx.make_subcontext_from_port(inp)
     namespace = namespace or subcontext.detector.detect_name()
     result = transform(subcontext, subcontext.data, namespace=namespace)

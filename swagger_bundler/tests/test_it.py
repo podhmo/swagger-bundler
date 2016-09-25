@@ -17,7 +17,7 @@ class GenerationgTests(unittest.TestCase):
         scan_items = [
             ("bundle", "x-bundler-bundle"),
             ("namespace", "x-bundler-namespace"),
-            ("disable_mangle", "x-bundler-disable_mangle")
+            ("ignore_prefixer", "x-bundler-ignore-prefixer")
         ]
         return make_rootcontext(lambda config: Detector(config, scan_items))
 
@@ -44,9 +44,9 @@ class GenerationgTests(unittest.TestCase):
             expected = yaml.load(rf)
         self.assertEqual(result, expected)
 
-    def test_it__disable_mangle(self):
+    def test_it__ignore_prefixer(self):
         # dependencies:
-        # group -> {common[disable_mangle]}
+        # group -> {common[ignore_prefixer]}
         ctx = self._makeRootContext()
 
         with open(os.path.join(here, "data/parts/group.parts.yaml")) as rf:
