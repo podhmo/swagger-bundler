@@ -39,7 +39,7 @@ class OptionScanner:
 
     @classmethod
     def from_configparser(cls, parser):
-        return cls(tuple(parser.items("reserved_word")))
+        return cls(tuple(parser.items("special_marker")))
 
     @classmethod
     def from_dict(cls, d):

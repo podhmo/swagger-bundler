@@ -37,7 +37,7 @@ def pickup_config(start_path=None, default=None):
 def init_config(path):
     template = """\
 [DEFAULT]
-[reserved_word]
+[special_marker]
 # todo: gentle description.
 namespace = x-bundler-namespace
 compose = x-bundler-compose
@@ -63,5 +63,5 @@ def describe_config(config, outp):
     import json
     d = OrderedDict()
     d["config"] = OrderedDict(config.items("config"))
-    d["reserved_word"] = OrderedDict(config.items("reserved_word"))
+    d["special_marker"] = OrderedDict(config.items("special_marker"))
     json.dump(d, outp, indent=2)
