@@ -1,3 +1,4 @@
+import copy
 from collections import Mapping
 from . import loading
 from .ordering import ordering, make_dict
@@ -14,7 +15,6 @@ def _merge(dct, merge_dct):
 
 
 def merge(x, y):
-    import copy
     return _merge(copy.deepcopy(x), copy.deepcopy(y))
 
 
@@ -26,13 +26,13 @@ def transform(ctx, result, files):
             continue
         additional = merge(additional, subcontext.data)
         subcontext.mark()
-        subfiles = subcontext.detector.detect_bundle()
+        subfiles = subcontext.detector.detect_compose()
         if subfiles:
             transform(subcontext, additional, subfiles)
     return merge(additional, result)
 
 
-def bundle(ctx, files, outp):
+def run(ctx, files, outp):
     result = transform(ctx, make_dict(), files)
     ordered = ordering(result)
     loading.dump(ordered, outp, allow_unicode=True, default_flow_style=False)

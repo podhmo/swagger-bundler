@@ -1,15 +1,15 @@
 # -*- coding:utf-8 -*-
 from . import loading
 from .ordering import ordering, make_dict
-from . import bundling
+from . import composing
 from . import prefixing
 
 
 def transform(ctx, data):
-    subfiles = ctx.detector.detect_bundle()
+    subfiles = ctx.detector.detect_compose()
     if subfiles:
-        additional = bundling.transform(ctx, make_dict(), subfiles)
-        data = bundling.merge(additional, data)
+        additional = composing.transform(ctx, make_dict(), subfiles)
+        data = composing.merge(additional, data)
 
     namespace = ctx.detector.detect_namespace()
     if namespace:

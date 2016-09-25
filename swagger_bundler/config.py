@@ -40,7 +40,7 @@ def init_config(path):
 [reserved_word]
 # todo: gentle description.
 namespace = x-bundler-namespace
-bundle = x-bundler-bundle
+compose = x-bundler-compose
 ignore_prefixer = x-bundler-ignore-prefixer
 """
     sys.stderr.write("generate {}.\n".format(path))

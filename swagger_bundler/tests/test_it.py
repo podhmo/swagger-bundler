@@ -15,7 +15,7 @@ class GenerationgTests(unittest.TestCase):
         from swagger_bundler.context import Detector
         # [(sysname, getname),...]
         scan_items = [
-            ("bundle", "x-bundler-bundle"),
+            ("compose", "x-bundler-compose"),
             ("namespace", "x-bundler-namespace"),
             ("ignore_prefixer", "x-bundler-ignore-prefixer")
         ]

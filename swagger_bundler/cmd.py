@@ -4,7 +4,6 @@ import click
 
 from swagger_bundler import make_rootcontext
 from swagger_bundler import config as configuration
-import swagger_bundler.bundling as bundling
 import swagger_bundler.ordering as ordering
 import swagger_bundler.generating as generating
 
@@ -39,13 +38,6 @@ def config(file, init):
             return _on_config_file_is_not_found()
         config = configuration.load_config(config_path)
         return configuration.describe_config(config, sys.stdout)
-
-
-@main.command()
-@click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
-def bundle(files):
-    ctx = _prepare()
-    bundling.bundle(ctx, files, sys.stdout)
 
 
 @main.command(help="generating bundled yaml. (see: namespace and bundle field)")

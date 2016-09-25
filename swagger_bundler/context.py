@@ -33,8 +33,8 @@ class Detector:
                 for sysname, getname in self.scan_items
                 if getname in data}
 
-    def detect_bundle(self):
-        return self.config.get("bundle") or []
+    def detect_compose(self):
+        return self.config.get("compose") or []
 
     def detect_namespace(self):
         return self.config.get("namespace")
