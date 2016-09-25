@@ -7,8 +7,8 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 class GenerationgTests(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
-        from swagger_bundler import generating
-        return generating.transform(*args, **kwargs)
+        from swagger_bundler import bundling
+        return bundling.transform(*args, **kwargs)
 
     def _makeRootContext(self):
         from swagger_bundler.context import make_rootcontext

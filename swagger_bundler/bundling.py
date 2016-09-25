@@ -17,7 +17,7 @@ def transform(ctx, data):
     return data
 
 
-def generate(ctx, inp, outp):
+def run(ctx, inp, outp):
     subcontext = ctx.make_subcontext_from_port(inp)
     result = transform(subcontext, subcontext.data)
     ordered = ordering(result)
