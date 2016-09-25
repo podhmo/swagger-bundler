@@ -18,7 +18,11 @@ def main(ctx_):
 
 
 def _prepare():
-    ctx = make_rootcontext()
+    config_path = configuration.pickup_config(os.getcwd()) or "~/.{}".format(configuration.CONFIG_NAME)
+    if not os.path.exists(config_path):
+        return _on_config_file_is_not_found()
+    parser = configuration.load_config(config_path)
+    ctx = make_rootcontext(parser)
     ordering.setup()
     return ctx
 
@@ -33,11 +37,9 @@ def config(file, init):
         return configuration.init_config(config_path)
     else:
         if config_path is None:
-            sys.stderr.write("config file not found:\nplease run `swagger-bundler config --init`\n")
-            sys.stderr.flush()
-            sys.exit(-1)
+            return _on_config_file_is_not_found()
         config = configuration.load_config(config_path)
-        configuration.describe_config(config, sys.stdout)
+        return configuration.describe_config(config, sys.stdout)
 
 
 @main.command()
@@ -68,6 +70,12 @@ def generate(file):
     else:
         with open(file) as rf:
             generating.generate(ctx, rf, sys.stdout)
+
+
+def _on_config_file_is_not_found():
+    sys.stderr.write("config file not found:\nplease run `swagger-bundler config --init`\n")
+    sys.stderr.flush()
+    sys.exit(-1)
 
 
 if __name__ == "__main__":

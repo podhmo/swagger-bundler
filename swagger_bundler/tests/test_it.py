@@ -10,10 +10,20 @@ class GenerationgTests(unittest.TestCase):
         from swagger_bundler import generating
         return generating.transform(*args, **kwargs)
 
-    def test_it(self):
-        from swagger_bundler import make_rootcontext
+    def _makeRootContext(self):
+        from swagger_bundler.context import make_rootcontext
+        from swagger_bundler.context import Detector
+        # [(sysname, getname),...]
+        scan_items = [
+            ("bundle", "x-bundler-bundle"),
+            ("namespace", "x-bundler-namespace"),
+            ("disable_mangle", "x-bundler-disable_mangle")
+        ]
+        return make_rootcontext(lambda config: Detector(config, scan_items))
 
-        ctx = make_rootcontext()
+    def test_it(self):
+        ctx = self._makeRootContext()
+
         with open(os.path.join(here, "data/parts/product.parts.yaml")) as rf:
             subcontext = ctx.make_subcontext_from_port(rf)
             result = self._callFUT(subcontext, subcontext.data)
@@ -25,10 +35,8 @@ class GenerationgTests(unittest.TestCase):
         # dependencies:
         # user -> {group, common}
         # group -> {common}
+        ctx = self._makeRootContext()
 
-        from swagger_bundler import make_rootcontext
-
-        ctx = make_rootcontext()
         with open(os.path.join(here, "data/parts/user.parts.yaml")) as rf:
             subcontext = ctx.make_subcontext_from_port(rf)
             result = self._callFUT(subcontext, subcontext.data)
@@ -39,10 +47,8 @@ class GenerationgTests(unittest.TestCase):
     def test_it__disable_mangle(self):
         # dependencies:
         # group -> {common[disable_mangle]}
+        ctx = self._makeRootContext()
 
-        from swagger_bundler import make_rootcontext
-
-        ctx = make_rootcontext()
         with open(os.path.join(here, "data/parts/group.parts.yaml")) as rf:
             subcontext = ctx.make_subcontext_from_port(rf)
             result = self._callFUT(subcontext, subcontext.data)

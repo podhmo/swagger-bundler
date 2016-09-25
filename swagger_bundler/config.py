@@ -39,9 +39,9 @@ def init_config(path):
 [DEFAULT]
 [reserved_word]
 # todo: gentle description.
-mangle_marker = @namespace
-bundle_marker = @bundle
-disable_mangle_marker = @disable_mangle
+mangle_marker = x-bundler-namespace
+bundle_marker = x-bundler-bundle
+disable_mangle_marker = x-bundler-disable_mangle
 """
     sys.stderr.write("generate {}.\n".format(path))
     sys.stderr.flush()
