@@ -53,7 +53,7 @@ class Preprocessor:
     def preprocess_concat(self, detector, data):
         concat_members = detector.detect_concat()
         if concat_members:
-            ignore_members = detector.init_ignore_prefixer()
+            ignore_members = detector.init_exposed()
             compose_members = detector.init_compose()
             for fname in concat_members:
                 ignore_members.append(fname)
@@ -71,8 +71,8 @@ class Detector:
     def detect_compose(self):
         return self.config.get("compose") or []
 
-    def detect_ignore_prefixer(self):
-        return self.config.get("ignore_prefixer") or []
+    def detect_exposed(self):
+        return self.config.get("exposed") or []
 
     def detect_namespace(self):
         return self.config.get("namespace")
@@ -83,10 +83,10 @@ class Detector:
             v = self.config["compose"] = []
         return v
 
-    def init_ignore_prefixer(self):
-        v = self.config.get("ignore_prefixer")
+    def init_exposed(self):
+        v = self.config.get("exposed")
         if not v:
-            v = self.config["ignore_prefixer"] = []
+            v = self.config["exposed"] = []
         return v
 
 

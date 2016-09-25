@@ -18,7 +18,7 @@ class GenerationgTests(unittest.TestCase):
             ("compose", "x-bundler-compose"),
             ("concat", "x-bundler-concat"),
             ("namespace", "x-bundler-namespace"),
-            ("ignore_prefixer", "x-bundler-ignore-prefixer")
+            ("exposed", "x-bundler-exposed")
         ]
         return make_rootcontext(OptionScanner(scan_items))
 
@@ -45,9 +45,9 @@ class GenerationgTests(unittest.TestCase):
             expected = yaml.load(rf)
         self.assertEqual(result, expected)
 
-    def test_it__ignore_prefixer(self):
+    def test_it__exposed(self):
         # dependencies:
-        # group -> {common[ignore_prefixer]}
+        # group -> {common[exposed]}
         ctx = self._makeRootContext()
 
         with open(os.path.join(here, "data/parts/group.parts.yaml")) as rf:
@@ -59,7 +59,7 @@ class GenerationgTests(unittest.TestCase):
 
     def test_it__recursive_information(self):
         # dependencies:
-        # group-user -> {group -> {common[ignore_prefixer]}, user -> {group, common}}
+        # group-user -> {group -> {common[exposed]}, user -> {group, common}}
         ctx = self._makeRootContext()
 
         with open(os.path.join(here, "data/rel/group-user.yaml")) as rf:

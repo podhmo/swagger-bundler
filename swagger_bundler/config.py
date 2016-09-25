@@ -42,7 +42,7 @@ def init_config(path):
 namespace = x-bundler-namespace
 compose = x-bundler-compose
 concat = x-bundler-concat
-ignore_prefixer = x-bundler-ignore-prefixer
+exposed = x-bundler-exposed
 """
     sys.stderr.write("generate {}.\n".format(path))
     sys.stderr.flush()

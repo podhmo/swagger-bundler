@@ -13,9 +13,9 @@ def _titleize(s):
 
 
 class Prefixer:
-    def __init__(self, namespace, ignore_prefixer_predicate):
+    def __init__(self, namespace, exposed_predicate):
         self.namespace = namespace
-        self.ignore_prefixer_predicate = ignore_prefixer_predicate
+        self.exposed_predicate = exposed_predicate
 
     def add_prefix(self, data):
         return self.transform(data, toplevel=True)
@@ -43,9 +43,9 @@ class Prefixer:
             return v
         head, tail = v.rsplit("/", 1)
 
-        # ignore_prefixer
+        # exposed
         for k in ["definitions", "responses"]:
-            if "/{}".format(k) in head and tail in self.ignore_prefixer_predicate[k]:
+            if "/{}".format(k) in head and tail in self.exposed_predicate[k]:
                 return v
         return "/".join([head, "{}{}".format(self.namespace, _titleize(tail))])
 
@@ -56,9 +56,9 @@ class Prefixer:
 
     def _transform_definitions(self, data):
         d = make_dict()
-        ignore_prefixers = self.ignore_prefixer_predicate["definitions"]
+        exposeds = self.exposed_predicate["definitions"]
         for k, v in data.items():
-            if k in ignore_prefixers:
+            if k in exposeds:
                 d[k] = self.transform(v)
             else:
                 d[self._transform_name(k)] = self.transform(v)
@@ -66,29 +66,29 @@ class Prefixer:
 
     def _transform_responses(self, data):
         d = make_dict()
-        ignore_prefixers = self.ignore_prefixer_predicate["responses"]
+        exposeds = self.exposed_predicate["responses"]
         for k, v in data.items():
-            if k in ignore_prefixers:
+            if k in exposeds:
                 d[k] = self.transform(v)
             else:
                 d[self._transform_name(k)] = self.transform(v)
         return d
 
 
-def _get_ignore_prefixer_detail(ctx):
+def _get_exposed_detail(ctx):
     # Dict[path, {"responses", "definitions"}]
     detail = defaultdict(dict)
     detail[ctx.path] = {
         "responses": set(ctx.data.get("responses", {}).keys()),
         "definitions": set(ctx.data.get("definitions", {}).keys())
     }
-    ignore_path_set = {ctx.resolver.resolve_path(fname) for fname in ctx.detector.detect_ignore_prefixer()}
+    ignore_path_set = {ctx.resolver.resolve_path(fname) for fname in ctx.detector.detect_exposed()}
     compose_path_set = {ctx.resolver.resolve_path(fname) for fname in ctx.detector.detect_compose()}
 
     # sub relation
     for fname in ctx.detector.detect_compose():
         subcontext = ctx.make_subcontext(fname)
-        subdetail = _get_ignore_prefixer_detail(subcontext)
+        subdetail = _get_exposed_detail(subcontext)
         for subpath, subpair in subdetail.items():
             if subpath in ignore_path_set:
                 detail[subpath].update(subpair)
@@ -100,9 +100,9 @@ def _get_ignore_prefixer_detail(ctx):
     return detail
 
 
-def get_ignore_prefixer_predicate(ctx):
+def get_exposed_predicate(ctx):
     predicate = {"responses": set(), "definitions": set()}
-    detail = _get_ignore_prefixer_detail(ctx)
+    detail = _get_exposed_detail(ctx)
     detail.pop(ctx.path)
     for pair in detail.values():
         predicate["responses"].update(pair["responses"])
@@ -114,9 +114,9 @@ def transform(ctx, data, namespace=None):
     if namespace is None:
         return data
 
-    ignore_prefixer_predicate = get_ignore_prefixer_predicate(ctx)
-    logger.debug("transform: namespace=%s, ignore=%s", namespace, ignore_prefixer_predicate)
-    prefixer = Prefixer(namespace, ignore_prefixer_predicate)
+    exposed_predicate = get_exposed_predicate(ctx)
+    logger.debug("transform: namespace=%s, ignore=%s", namespace, exposed_predicate)
+    prefixer = Prefixer(namespace, exposed_predicate)
     return prefixer.add_prefix(data)
 
 
