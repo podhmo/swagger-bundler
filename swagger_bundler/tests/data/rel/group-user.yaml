@@ -1,0 +1,4 @@
+x-bundler-namespace: GU
+x-bundler-compose:
+  - ../parts/group.parts.yaml
+  - ../parts/user.parts.yaml

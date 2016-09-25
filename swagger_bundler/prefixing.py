@@ -1,6 +1,11 @@
 # -*- coding:utf-8 -*-
+import logging
+from collections import defaultdict
 from . import loading
 from .ordering import ordering, make_dict
+
+
+logger = logging.getLogger(__name__)
 
 
 def _titleize(s):
@@ -70,18 +75,47 @@ class Prefixer:
         return d
 
 
+def _get_ignore_prefixer_detail(ctx):
+    # Dict[path, {"responses", "definitions"}]
+    detail = defaultdict(dict)
+    detail[ctx.path] = {
+        "responses": set(ctx.data.get("responses", {}).keys()),
+        "definitions": set(ctx.data.get("definitions", {}).keys())
+    }
+    ignore_path_set = {ctx.resolver.resolve_path(fname) for fname in ctx.detector.detect_ignore_prefixer()}
+    compose_path_set = {ctx.resolver.resolve_path(fname) for fname in ctx.detector.detect_compose()}
+
+    # sub relation
+    for fname in ctx.detector.detect_compose():
+        subcontext = ctx.make_subcontext(fname)
+        subdetail = _get_ignore_prefixer_detail(subcontext)
+        for subpath, subpair in subdetail.items():
+            if subpath in ignore_path_set:
+                detail[subpath].update(subpair)
+            elif subpath in compose_path_set:
+                continue
+            else:
+                detail[subpath].update(subpair)
+    logger.debug("ignore prefixer detail: %s", detail)
+    return detail
+
+
+def get_ignore_prefixer_predicate(ctx):
+    predicate = {"responses": set(), "definitions": set()}
+    detail = _get_ignore_prefixer_detail(ctx)
+    detail.pop(ctx.path)
+    for pair in detail.values():
+        predicate["responses"].update(pair["responses"])
+        predicate["definitions"].update(pair["definitions"])
+    return predicate
+
+
 def transform(ctx, data, namespace=None):
     if namespace is None:
         return data
 
-    ignore_prefixer_predicate = {"responses": set(), "definitions": set()}
-    for fname in ctx.detector.detect_ignore_prefixer():
-        path = ctx.resolver.resolve_path(fname)
-        if path in ctx.env:
-            subdata = ctx.env[path].data
-            ignore_prefixer_predicate["responses"].update(subdata.get("responses", []).keys())
-            ignore_prefixer_predicate["definitions"].update(subdata.get("definitions", []).keys())
-
+    ignore_prefixer_predicate = get_ignore_prefixer_predicate(ctx)
+    logger.debug("transform: namespace=%s, ignore=%s", namespace, ignore_prefixer_predicate)
     prefixer = Prefixer(namespace, ignore_prefixer_predicate)
     return prefixer.add_prefix(data)
 

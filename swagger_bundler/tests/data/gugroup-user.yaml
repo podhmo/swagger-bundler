@@ -1,0 +1,74 @@
+swagger: '2.0'
+info:
+  title: user api
+  description: user and group
+  version: 1.0.0
+host: localhost
+schemes:
+- http
+basePath: /
+produces:
+- application/json
+definitions:
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
+  GUGroup:
+    type: object
+    properties:
+      group_id:
+        type: string
+      name:
+        type: string
+        description: name of group.
+  GUUser:
+    type: object
+    properties:
+      user_id:
+        type: string
+      name:
+        type: string
+        description: name of user.
+      groups:
+        type: array
+        items:
+          $ref: '#/definitions/GUGroup'
+responses:
+  UnexpectedError:
+    description: Unexpected error
+    schema:
+      $ref: '#/definitions/Error'
+paths:
+  /groups:
+    get:
+      summary: group
+      description: group list
+      responses:
+        200:
+          description: An array of groups
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/GUGroup'
+        default:
+          $ref: '#/responses/UnexpectedError'
+  /users:
+    get:
+      summary: user
+      description: user list
+      responses:
+        200:
+          description: An array of users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/GUUser'
+        default:
+          $ref: '#/responses/UnexpectedError'
