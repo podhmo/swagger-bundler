@@ -1,0 +1,45 @@
+x-bundler-bundle:
+  - common.parts.yaml
+  - group.parts.yaml
+x-bundler-namespace: Y
+
+swagger: '2.0'
+info:
+  title: user api
+  description: user and group
+  version: 1.0.0
+host: localhost
+schemes:
+- http
+basePath: /
+produces:
+- application/json
+
+paths:
+  /users:
+    get:
+      summary: user
+      description: user list
+      responses:
+        200:
+          description: An array of users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        default:
+          $ref: '#/responses/UnexpectedError'
+
+definitions:
+  User:
+    type: object
+    properties:
+      user_id:
+        type: string
+      name:
+        type: string
+        description: name of user.
+      groups:
+        type: array
+        items:
+          $ref: '#/definitions/Group'

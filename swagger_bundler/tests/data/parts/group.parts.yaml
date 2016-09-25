@@ -1,0 +1,30 @@
+x-bundler-namespace: Z
+x-bundler-bundle:
+  - common.parts.yaml
+x-bundler-disable_mangle:
+  - common.parts.yaml
+
+paths:
+  /groups:
+    get:
+      summary: group
+      description: group list
+      responses:
+        200:
+          description: An array of groups
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Group'
+        default:
+          $ref: '#/responses/UnexpectedError'
+
+definitions:
+  Group:
+    type: object
+    properties:
+      group_id:
+        type: string
+      name:
+        type: string
+        description: name of group.

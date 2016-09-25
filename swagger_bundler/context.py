@@ -5,7 +5,8 @@ from . import loading
 
 
 class Env:
-    def __init__(self, pool=None):
+    def __init__(self, detector_factory, pool=None):
+        self.detector_factory = detector_factory
         self.pool = pool or {}  # Dict[path, context]
 
     def __contains__(self, path):
@@ -19,13 +20,18 @@ class Env:
 
 
 class Detector:
-    def __init__(self, config):
+    def __init__(self, config, scan_items):
         self.config = config
 
+        # usually {"bundle": "@bundle", ...}
+        # so in yaml file: @bundle: <bundle value>
+        # in program: "bundle" as keyword.
+        self.scan_items = scan_items
+
     def scan(self, data):
-        # todo: config special marker field
-        candidates = ["bundle", "namespace", "disable_mangle"]
-        return {c: data.pop(c) for c in candidates if c in data}
+        return {sysname: data.pop(getname)
+                for sysname, getname in self.scan_items
+                if getname in data}
 
     def detect_bundle(self):
         return self.config.get("bundle") or []
@@ -35,6 +41,16 @@ class Detector:
 
     def detect_disable_mangle(self):
         return self.config.get("disable_mangle") or []
+
+
+class DetectorFactoryFromConfigParser:
+    def __init__(self, parser, cls=Detector):
+        self.cls = cls
+        self.parser = parser
+        self.scan_items = tuple(self.parser.items("reserved_word"))
+
+    def __call__(self, config):
+        return self.cls(config, self.scan_items)
 
 
 class PathResolver:
@@ -79,7 +95,7 @@ class Context:
             with open(subresolver.path) as rf:
                 data = loading.load(rf)
         subconfig = self.detector.scan(data)
-        subdetector = self.detector.__class__(subconfig)
+        subdetector = self.env.detector_factory(subconfig)
         subcontext = self.__class__(self.env, subdetector, subresolver, data)
         self.env.register_context(subcontext)
         return subcontext
@@ -92,10 +108,10 @@ class Context:
             return self.make_subcontext(port.name, data=data)
 
 
-def make_rootcontext():
+def make_rootcontext(detector_factory):
     config = {"root": True}
-    detector = Detector(config)
-    env = Env()
+    env = Env(detector_factory)
+    detector = detector_factory(config)
     resolver = PathResolver(".")
     data = {}
     return Context(env, detector, resolver, data)
