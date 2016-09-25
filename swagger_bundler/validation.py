@@ -4,10 +4,8 @@
 
 import json
 import os.path
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import StringIO
+from collections import OrderedDict
+from io import StringIO
 
 
 from jsonschema import validate
@@ -56,9 +54,9 @@ def generate_validation_error_report(e, json_object, lines_before=7, lines_after
     errline = None
 
     for lineno, text in enumerate(io):
-            if marker in text:
-                errline = lineno
-                break
+        if marker in text:
+            errline = lineno
+            break
 
     if errline is not None:
         # Re-create report.
@@ -72,7 +70,7 @@ def generate_validation_error_report(e, json_object, lines_before=7, lines_after
                 line_text = "{:4}: >>>".format(lineno + 1)
             else:
                 line_text = "{:4}:    ".format(lineno + 1)
-                report.append(line_text + text.rstrip("\n"))
+            report.append(line_text + text.rstrip("\n"))
 
         report = report[max(0, errline - lines_before):errline + 1 + lines_after]
 
@@ -102,4 +100,21 @@ def run(inp, out):
     with open(schema_path) as rf:
         schema = json.load(rf)
     data = loading.load(inp)
-    print(check_json(data, schema))
+
+    def fix(d, after_responses=False):
+        if hasattr(d, "keys"):
+            for k in list(d.keys()):
+                if k == "responses":
+                    d[fix(k, after_responses=True)] = fix(d.pop(k), after_responses=True)
+                else:
+                    d[fix(k, after_responses=after_responses)] = fix(d.pop(k), after_responses=after_responses)
+            return d
+        elif isinstance(d, (list, tuple)):
+            for e in d:
+                fix(e, after_responses=after_responses)
+            return d
+        elif after_responses and isinstance(d, int):
+            return str(d)
+        else:
+            return d
+    out.write(str(check_json(fix(data), schema)))
