@@ -26,7 +26,7 @@ def _merged(left, right):
         else:
             raise ValueError("cannot merge dict and non-dict: left=%s, right=%s", left, right)
     else:
-        raise ValueError("not supported: left=%s, right=%s", left, right)
+        return right
 
 
 def merged(left, right):

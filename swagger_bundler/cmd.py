@@ -6,6 +6,7 @@ from swagger_bundler import make_rootcontext_from_configparser
 from swagger_bundler import config as configuration
 import swagger_bundler.ordering as ordering
 import swagger_bundler.bundling as bundling
+import swagger_bundler.composing as composing
 
 
 @click.group()
@@ -50,6 +51,13 @@ def bundle(file, log):
         logging.basicConfig(level=logging.DEBUG)
     with open(file) as rf:
         bundling.run(ctx, rf, sys.stdout)
+
+
+@main.command()
+@click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
+def concat(files):
+    ctx = _prepare()
+    composing.run(ctx, files, sys.stdout)
 
 
 def _on_config_file_is_not_found():
