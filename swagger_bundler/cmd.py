@@ -7,6 +7,7 @@ from swagger_bundler import config as configuration
 import swagger_bundler.ordering as ordering
 import swagger_bundler.bundling as bundling
 import swagger_bundler.composing as composing
+import swagger_bundler.validation as validation
 
 
 @click.group()
@@ -51,6 +52,13 @@ def bundle(file, log):
         logging.basicConfig(level=logging.DEBUG)
     with open(file) as rf:
         bundling.run(ctx, rf, sys.stdout)
+
+
+@main.command()
+@click.argument("file", required=True, type=click.Path(exists=True))
+def validate(file):
+    with open(file) as rf:
+        validation.run(rf, sys.stdout)
 
 
 @main.command()

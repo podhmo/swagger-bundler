@@ -1,0 +1,3 @@
+exclude .gitignore
+prune .git
+graft swagger_bundler/schema

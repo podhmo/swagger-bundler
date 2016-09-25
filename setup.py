@@ -30,6 +30,10 @@ tests_require = [
 testing_extras = tests_require + [
 ]
 
+validation_extras = [
+    "jsonschema"
+]
+
 setup(name='swagger-bundler',
       version='0.0',
       description='swagger schema bundler',
@@ -37,6 +41,7 @@ setup(name='swagger-bundler',
       classifiers=[
           "Programming Language :: Python",
           "Programming Language :: Python :: Implementation :: CPython",
+          'Programming Language :: Python :: 3',
       ],
       keywords='',
       author="podhmo",
@@ -49,6 +54,7 @@ setup(name='swagger-bundler',
       extras_require={
           'testing': testing_extras,
           'docs': docs_extras,
+          "validation": validation_extras
       },
       tests_require=tests_require,
       test_suite="swagger_bundler.tests",
