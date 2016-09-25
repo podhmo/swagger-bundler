@@ -1,7 +1,10 @@
 import copy
 from collections import Mapping
+import logging
 from . import loading
 from .ordering import ordering, make_dict
+
+logger = logging.getLogger(__name__)
 
 
 # xxx:
@@ -15,10 +18,11 @@ def _merge(dct, merge_dct):
 
 
 def merge(x, y):
-    return _merge(copy.deepcopy(x), copy.deepcopy(y))
+    return _merge(x, copy.deepcopy(y))
 
 
 def transform(ctx, result, files):
+    logger.debug("transform: files=%s", files)
     additional = make_dict()
     for src in files:
         subcontext = ctx.make_subcontext(src)

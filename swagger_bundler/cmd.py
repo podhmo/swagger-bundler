@@ -42,8 +42,12 @@ def config(file, init):
 
 @main.command(help="bundle yaml")
 @click.argument("file", required=True, type=click.Path(exists=True))
-def bundle(file):
+@click.option("--log/--", default=False)  # TODO: まじめに
+def bundle(file, log):
     ctx = _prepare()
+    if log:
+        import logging
+        logging.basicConfig(level=logging.DEBUG)
     with open(file) as rf:
         bundling.run(ctx, rf, sys.stdout)
 

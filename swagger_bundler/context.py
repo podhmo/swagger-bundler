@@ -1,7 +1,9 @@
 # -*- coding:utf-8 -*-
 import os.path
 import sys
+import logging
 from . import loading
+logger = logging.getLogger(__name__)
 
 
 class Env:
@@ -15,6 +17,9 @@ class Env:
 
     def __getitem__(self, path):
         return self.pool[path]
+
+    def get(self, path, default=None):
+        return self.pool.get(path) or default
 
     def register_context(self, context):
         self.pool[context.path] = context
@@ -131,7 +136,8 @@ class Context:
         subdetector = self.detector.__class__(subconfig)
 
         self.env.preprocessor(subdetector, data)
-
+        logger.debug("make context: file=%s", subresolver.path)
+        logger.debug("make context: config=%s", subdetector.config)
         subcontext = self.__class__(self.env, subdetector, subresolver, data)
         self.env.register_context(subcontext)
         return subcontext
