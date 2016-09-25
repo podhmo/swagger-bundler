@@ -35,7 +35,7 @@ validation_extras = [
 ]
 
 setup(name='swagger-bundler',
-      version='0.0',
+      version='0.0.1',
       description='swagger schema bundler',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
