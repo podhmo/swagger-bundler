@@ -1,0 +1,96 @@
+swagger: '2.0'
+info:
+  title: user api
+  description: user and group
+  version: 1.0.0
+host: localhost
+schemes:
+- http
+basePath: /
+produces:
+- application/json
+definitions:
+  YError:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
+  YGroup:
+    type: object
+    properties:
+      group_id:
+        type: string
+      name:
+        type: string
+        description: name of group.
+  YUser:
+    type: object
+    properties:
+      user_id:
+        type: string
+      name:
+        type: string
+        description: name of user.
+      groups:
+        type: array
+        items:
+          $ref: '#/definitions/YGroup'
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
+  ZGroup:
+    type: object
+    properties:
+      group_id:
+        type: string
+      name:
+        type: string
+        description: name of group.
+responses:
+  YUnexpectedError:
+    description: Unexpected error
+    schema:
+      $ref: '#/definitions/YError'
+  UnexpectedError:
+    description: Unexpected error
+    schema:
+      $ref: '#/definitions/Error'
+paths:
+  /groups:
+    get:
+      summary: group
+      description: group list
+      responses:
+        200:
+          description: An array of groups
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ZGroup'
+        default:
+          $ref: '#/responses/UnexpectedError'
+  /users:
+    get:
+      summary: user
+      description: user list
+      responses:
+        200:
+          description: An array of users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/YUser'
+        default:
+          $ref: '#/responses/YUnexpectedError'
