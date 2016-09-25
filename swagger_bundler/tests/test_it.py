@@ -56,3 +56,17 @@ class GenerationgTests(unittest.TestCase):
         with open(os.path.join(here, "data/zgroup.yaml")) as rf:
             expected = yaml.load(rf)
         self.assertEqual(result, expected)
+
+    def test_it__recursive_information(self):
+        # dependencies:
+        # group-user -> {group -> {common[ignore_prefixer]}, user -> {group, common}}
+        ctx = self._makeRootContext()
+
+        with open(os.path.join(here, "data/rel/group-user.yaml")) as rf:
+            subcontext = ctx.make_subcontext_from_port(rf)
+            result = self._callFUT(subcontext, subcontext.data)
+        with open(os.path.join(here, "data/gugroup-user.yaml")) as rf:
+            expected = yaml.load(rf)
+        self.assertEqual(result, expected)
+
+    # todo: add prefixed import
