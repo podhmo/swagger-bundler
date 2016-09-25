@@ -42,7 +42,7 @@ def config(file, init):
 
 @main.command(help="bundle yaml")
 @click.argument("file", required=True, type=click.Path(exists=True))
-def generate(file):
+def bundle(file):
     ctx = _prepare()
     with open(file) as rf:
         bundling.run(ctx, rf, sys.stdout)
