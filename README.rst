@@ -1,6 +1,10 @@
 swagger-bundler
 ========================================
 
+```
+$ pip install "swagger-bundler[validation]"
+```
+
 - yaml only
 - python3 only
 
