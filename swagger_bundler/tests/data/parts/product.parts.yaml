@@ -1,5 +1,5 @@
 x-bundler-namespace: X
-x-bundler-bundle:
+x-bundler-compose:
   - common.parts.yaml
 
 # this is an example of the Uber API

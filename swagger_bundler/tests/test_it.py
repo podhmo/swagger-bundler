@@ -7,19 +7,20 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 class GenerationgTests(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
-        from swagger_bundler import generating
-        return generating.transform(*args, **kwargs)
+        from swagger_bundler import bundling
+        return bundling.transform(*args, **kwargs)
 
     def _makeRootContext(self):
         from swagger_bundler.context import make_rootcontext
-        from swagger_bundler.context import Detector
+        from swagger_bundler.context import OptionScanner
         # [(sysname, getname),...]
         scan_items = [
-            ("bundle", "x-bundler-bundle"),
+            ("compose", "x-bundler-compose"),
+            ("concat", "x-bundler-concat"),
             ("namespace", "x-bundler-namespace"),
-            ("disable_mangle", "x-bundler-disable_mangle")
+            ("ignore_prefixer", "x-bundler-ignore-prefixer")
         ]
-        return make_rootcontext(lambda config: Detector(config, scan_items))
+        return make_rootcontext(OptionScanner(scan_items))
 
     def test_it(self):
         ctx = self._makeRootContext()
@@ -44,9 +45,9 @@ class GenerationgTests(unittest.TestCase):
             expected = yaml.load(rf)
         self.assertEqual(result, expected)
 
-    def test_it__disable_mangle(self):
+    def test_it__ignore_prefixer(self):
         # dependencies:
-        # group -> {common[disable_mangle]}
+        # group -> {common[ignore_prefixer]}
         ctx = self._makeRootContext()
 
         with open(os.path.join(here, "data/parts/group.parts.yaml")) as rf:

@@ -1,7 +1,5 @@
 x-bundler-namespace: Z
-x-bundler-bundle:
-  - common.parts.yaml
-x-bundler-disable_mangle:
+x-bundler-concat:
   - common.parts.yaml
 
 paths:

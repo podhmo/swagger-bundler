@@ -1,4 +1,4 @@
-x-bundler-bundle:
+x-bundler-compose:
   - common.parts.yaml
   - group.parts.yaml
 x-bundler-namespace: Y

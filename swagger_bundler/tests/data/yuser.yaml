@@ -9,8 +9,6 @@ schemes:
 basePath: /
 produces:
 - application/json
-
-
 definitions:
   YError:
     type: object
