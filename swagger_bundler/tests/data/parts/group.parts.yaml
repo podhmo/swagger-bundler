@@ -2,6 +2,18 @@ x-bundler-namespace: Z
 x-bundler-concat:
   - common.parts.yaml
 
+swagger: '2.0'
+info:
+  title: user api
+  description: user and group
+  version: 1.0.0
+host: localhost
+schemes:
+- http
+basePath: /
+produces:
+- application/json
+
 paths:
   /groups:
     get:

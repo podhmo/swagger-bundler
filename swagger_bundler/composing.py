@@ -2,7 +2,6 @@
 import logging
 from . import loading
 from .ordering import ordering, make_dict
-
 logger = logging.getLogger(__name__)
 
 
@@ -10,9 +9,12 @@ def _merged(left, right):
     if isinstance(left, list):
         r = left[:]
         if isinstance(right, (list, tuple)):
-            r.extend(right)
+            for e in right:
+                if e not in r:
+                    r.extend(e)
         else:
-            r.append(right)
+            if right not in r:
+                r.append(right)
         return r
     elif hasattr(left, "get"):
         if hasattr(right, "get"):
