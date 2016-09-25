@@ -1,7 +1,5 @@
 x-bundler-namespace: Z
-x-bundler-compose:
-  - common.parts.yaml
-x-bundler-ignore-prefixer:
+x-bundler-concat:
   - common.parts.yaml
 
 paths:

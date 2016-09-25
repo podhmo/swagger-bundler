@@ -41,6 +41,7 @@ def init_config(path):
 # todo: gentle description.
 namespace = x-bundler-namespace
 compose = x-bundler-compose
+concat = x-bundler-concat
 ignore_prefixer = x-bundler-ignore-prefixer
 """
     sys.stderr.write("generate {}.\n".format(path))

@@ -16,6 +16,7 @@ class GenerationgTests(unittest.TestCase):
         # [(sysname, getname),...]
         scan_items = [
             ("compose", "x-bundler-compose"),
+            ("concat", "x-bundler-concat"),
             ("namespace", "x-bundler-namespace"),
             ("ignore_prefixer", "x-bundler-ignore-prefixer")
         ]

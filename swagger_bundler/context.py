@@ -5,8 +5,9 @@ from . import loading
 
 
 class Env:
-    def __init__(self, option_scanner, pool=None):
+    def __init__(self, option_scanner, pool=None, preprocessor=None):
         self.option_scanner = option_scanner
+        self.preprocessor = preprocessor or DEFAULT_PREPROCESSOR
         self.pool = pool or {}  # Dict[path, context]
 
     def __contains__(self, path):
@@ -40,6 +41,21 @@ class OptionScanner:
         return cls(tuple(d.items()))
 
 
+class Preprocessor:
+    def __call__(self, detector, data):
+        return self.preprocess_concat(detector, data)
+
+    def preprocess_concat(self, detector, data):
+        concat_members = detector.detect_concat()
+        if concat_members:
+            ignore_members = detector.init_ignore_prefixer()
+            compose_members = detector.init_compose()
+            for fname in concat_members:
+                ignore_members.append(fname)
+                compose_members.append(fname)
+        return data
+
+
 class Detector:
     def __init__(self, config):
         self.config = config
@@ -50,11 +66,23 @@ class Detector:
     def detect_compose(self):
         return self.config.get("compose") or []
 
+    def detect_ignore_prefixer(self):
+        return self.config.get("ignore_prefixer") or []
+
     def detect_namespace(self):
         return self.config.get("namespace")
 
-    def detect_ignore_prefixer(self):
-        return self.config.get("ignore_prefixer") or []
+    def init_compose(self):
+        v = self.config.get("compose")
+        if not v:
+            v = self.config["compose"] = []
+        return v
+
+    def init_ignore_prefixer(self):
+        v = self.config.get("ignore_prefixer")
+        if not v:
+            v = self.config["ignore_prefixer"] = []
+        return v
 
 
 class PathResolver:
@@ -98,8 +126,12 @@ class Context:
         if data is None:
             with open(subresolver.path) as rf:
                 data = loading.load(rf)
+
         subconfig = self.env.option_scanner.scan(data)
         subdetector = self.detector.__class__(subconfig)
+
+        self.env.preprocessor(subdetector, data)
+
         subcontext = self.__class__(self.env, subdetector, subresolver, data)
         self.env.register_context(subcontext)
         return subcontext
@@ -119,3 +151,5 @@ def make_rootcontext(option_scanner):
     resolver = PathResolver(".")
     data = {}
     return Context(env, detector, resolver, data)
+
+DEFAULT_PREPROCESSOR = Preprocessor()
