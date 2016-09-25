@@ -11,7 +11,7 @@ def _merged(left, right):
         if isinstance(right, (list, tuple)):
             for e in right:
                 if e not in r:
-                    r.extend(e)
+                    r.append(e)
         else:
             if right not in r:
                 r.append(right)
