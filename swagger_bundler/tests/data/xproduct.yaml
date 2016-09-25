@@ -10,7 +10,7 @@ basePath: /v1
 produces:
 - application/json
 definitions:
-  XError:
+  Error:
     type: object
     properties:
       code:
@@ -45,10 +45,10 @@ definitions:
         type: string
         description: Image URL representing the product.
 responses:
-  XUnexpectedError:
+  UnexpectedError:
     description: Unexpected error
     schema:
-      $ref: '#/definitions/XError'
+      $ref: '#/definitions/Error'
 paths:
   /products:
     get:
@@ -83,4 +83,4 @@ paths:
           schema:
             $ref: '#/definitions/XProductList'
         default:
-          $ref: '#/responses/XUnexpectedError'
+          $ref: '#/responses/UnexpectedError'

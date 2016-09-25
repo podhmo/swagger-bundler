@@ -1,5 +1,4 @@
-import copy
-from collections import Mapping
+# -*- coding:utf-8 -*-
 import logging
 from . import loading
 from .ordering import ordering, make_dict
@@ -7,33 +6,50 @@ from .ordering import ordering, make_dict
 logger = logging.getLogger(__name__)
 
 
-# xxx:
-def _merge(dct, merge_dct):
-    for k, v in merge_dct.items():
-        if (k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], Mapping)):
-            _merge(dct[k], merge_dct[k])
+def _merged(left, right):
+    if isinstance(left, list):
+        r = left[:]
+        if isinstance(right, (list, tuple)):
+            r.extend(right)
         else:
-            dct[k] = merge_dct[k]
-    return dct
+            r.append(right)
+        return r
+    elif hasattr(left, "get"):
+        if hasattr(right, "get"):
+            r = left.copy()
+            for k in right.keys():
+                if k in left:
+                    r[k] = _merged(r[k], right[k])
+                else:
+                    r[k] = right[k]
+            return r
+        else:
+            raise ValueError("cannot merge dict and non-dict: left=%s, right=%s", left, right)
+    else:
+        raise ValueError("not supported: left=%s, right=%s", left, right)
 
 
-def merge(x, y):
-    return _merge(x, copy.deepcopy(y))
+def merged(left, right):
+    # import json
+    # logger.debug("**merge: %s @@@@ %s**", json.dumps(left, indent=2), json.dumps(right, indent=2))
+    result = _merged(left, right)
+    # logger.debug("****merge result: %s****", json.dumps(result, indent=2))
+    return result
 
 
-def transform(ctx, result, files):
+def transform(ctx, fulldata, files):
     logger.debug("transform: files=%s", files)
     additional = make_dict()
     for src in files:
         subcontext = ctx.make_subcontext(src)
         if subcontext.is_marked():
             continue
-        additional = merge(additional, subcontext.data)
+        additional = merged(additional, subcontext.data)
         subcontext.mark()
         subfiles = subcontext.detector.detect_compose()
         if subfiles:
-            transform(subcontext, additional, subfiles)
-    return merge(additional, result)
+            additional = transform(subcontext, additional, subfiles)
+    return merged(additional, fulldata)
 
 
 def run(ctx, files, outp):

@@ -127,7 +127,6 @@ class Context:
         subresolver = self.resolver.make_subresolver(src)
         if subresolver.path in self.env:
             return self.env[subresolver.path]
-
         if data is None:
             with open(subresolver.path) as rf:
                 data = loading.load(rf)

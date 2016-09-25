@@ -1,6 +1,8 @@
 x-bundler-namespace: X
 x-bundler-compose:
   - common.parts.yaml
+x-bundler-ignore-prefixer:
+  - common.parts.yaml
 
 # this is an example of the Uber API
 # as a demonstration of an API spec in YAML
