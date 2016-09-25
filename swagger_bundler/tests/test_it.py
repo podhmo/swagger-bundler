@@ -12,14 +12,14 @@ class GenerationgTests(unittest.TestCase):
 
     def _makeRootContext(self):
         from swagger_bundler.context import make_rootcontext
-        from swagger_bundler.context import Detector
+        from swagger_bundler.context import OptionScanner
         # [(sysname, getname),...]
         scan_items = [
             ("compose", "x-bundler-compose"),
             ("namespace", "x-bundler-namespace"),
             ("ignore_prefixer", "x-bundler-ignore-prefixer")
         ]
-        return make_rootcontext(lambda config: Detector(config, scan_items))
+        return make_rootcontext(OptionScanner(scan_items))
 
     def test_it(self):
         ctx = self._makeRootContext()

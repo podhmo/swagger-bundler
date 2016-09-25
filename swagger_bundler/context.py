@@ -5,8 +5,8 @@ from . import loading
 
 
 class Env:
-    def __init__(self, detector_factory, pool=None):
-        self.detector_factory = detector_factory
+    def __init__(self, option_scanner, pool=None):
+        self.option_scanner = option_scanner
         self.pool = pool or {}  # Dict[path, context]
 
     def __contains__(self, path):
@@ -19,19 +19,33 @@ class Env:
         self.pool[context.path] = context
 
 
-class Detector:
-    def __init__(self, config, scan_items):
-        self.config = config
-
-        # usually {"bundle": "@bundle", ...}
-        # so in yaml file: @bundle: <bundle value>
-        # in program: "bundle" as keyword.
+class OptionScanner:
+    def __init__(self, scan_items):
+        # usually {"compose": "x-bundler-compose", ...}
+        # so in yaml file: x-bundler-compose: <compose sourcefile>
+        # in program: "compose" as keyword.
         self.scan_items = scan_items
 
     def scan(self, data):
         return {sysname: data.pop(getname)
                 for sysname, getname in self.scan_items
                 if getname in data}
+
+    @classmethod
+    def from_configparser(cls, parser):
+        return cls(tuple(parser.items("reserved_word")))
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(tuple(d.items()))
+
+
+class Detector:
+    def __init__(self, config):
+        self.config = config
+
+    def detect_concat(self):
+        return self.config.get("concat") or []
 
     def detect_compose(self):
         return self.config.get("compose") or []
@@ -41,16 +55,6 @@ class Detector:
 
     def detect_ignore_prefixer(self):
         return self.config.get("ignore_prefixer") or []
-
-
-class DetectorFactoryFromConfigParser:
-    def __init__(self, parser, cls=Detector):
-        self.cls = cls
-        self.parser = parser
-        self.scan_items = tuple(self.parser.items("reserved_word"))
-
-    def __call__(self, config):
-        return self.cls(config, self.scan_items)
 
 
 class PathResolver:
@@ -94,8 +98,8 @@ class Context:
         if data is None:
             with open(subresolver.path) as rf:
                 data = loading.load(rf)
-        subconfig = self.detector.scan(data)
-        subdetector = self.env.detector_factory(subconfig)
+        subconfig = self.env.option_scanner.scan(data)
+        subdetector = self.detector.__class__(subconfig)
         subcontext = self.__class__(self.env, subdetector, subresolver, data)
         self.env.register_context(subcontext)
         return subcontext
@@ -108,10 +112,10 @@ class Context:
             return self.make_subcontext(port.name, data=data)
 
 
-def make_rootcontext(detector_factory):
+def make_rootcontext(option_scanner):
     config = {"root": True}
-    env = Env(detector_factory)
-    detector = detector_factory(config)
+    env = Env(option_scanner)
+    detector = Detector(config)
     resolver = PathResolver(".")
     data = {}
     return Context(env, detector, resolver, data)
