@@ -107,7 +107,7 @@ and the content of main.yaml is this.
   x-bundler-concat:
     - ./parts/common.yaml
 
-and runn it.
+and run it.
 
 .. code-block:: bash
 

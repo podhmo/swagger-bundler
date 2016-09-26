@@ -1,1 +1,4 @@
+0.0.3
 
+- adding readme and examples
+- support json format(input/output)
