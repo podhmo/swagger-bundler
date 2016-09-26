@@ -98,7 +98,7 @@ and running `swagger-bundler bundle main.yaml`, then.
 - definitions in x.yaml, y.yaml are renamed (with namespace). (e.g. foo -> ZZZFoo)
 - definitions in common.yaml are not renamed. (e.g. bar -> bar)
 
-link of `example <example.rst>_`.
+link of `example <example.rst>`_.
 
 concat
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
