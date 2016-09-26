@@ -22,7 +22,7 @@ main.yaml
    x-bundler-concat:
      - ./parts/common.yaml
 
- common.yaml
+common.yaml
 
 .. code-block:: yaml
 
