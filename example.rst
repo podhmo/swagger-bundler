@@ -123,72 +123,72 @@ generated.yaml
 
 .. code-block:: yaml
 
-definitions:
-  Error:
-    type: object
-    properties:
-      code:
-        type: integer
-        format: int32
-  ZZZProductList:
-    type: array
-    items:
-      $ref: '#/definitions/ZZZProduct'
-  ZZZProduct:
-    type: object
-    properties:
-      product_id:
-        type: string
-        description: Unique ID.
-      description:
-        type: string
-        description: Description of product.
-      display_name:
-        type: string
-        description: Display name of product.
-  ZZZSeriesList:
-    type: array
-    items:
-      $ref: '#/definitions/ZZZSeries'
-  ZZZSeries:
-    type: object
-    properties:
-      series_id:
-        type: string
-        description: Unique ID.
-      display_name:
-        type: string
-        description: Display name of series.
-      products:
-        type: array
-        items:
-          $ref: '#/definitions/ZZZProduct'
-        description: Display name of series.
-responses:
-  UnexpectedError:
-    description: Unexpected error
-    schema:
-      $ref: '#/definitions/Error'
-paths:
-  /products:
-    get:
-      summary: Product Types
-      description: <description>
-      responses:
-        200:
-          description: An array of products
-          schema:
-            $ref: '#/definitions/ZZZProductList'
-        default:
-          $ref: '#/responses/UnexpectedError'
-  /seriess:
-    get:
-      summary: Series Types
-      description: <description>
-      responses:
-        200:
-          description: An array of seriess
-          schema:
-            $ref: '#/definitions/ZZZSeriesList'
-        default:
-          $ref: '#/responses/UnexpectedError'
+   definitions:
+     Error:
+       type: object
+       properties:
+         code:
+           type: integer
+           format: int32
+     ZZZProductList:
+       type: array
+       items:
+         $ref: '#/definitions/ZZZProduct'
+     ZZZProduct:
+       type: object
+       properties:
+         product_id:
+           type: string
+           description: Unique ID.
+         description:
+           type: string
+           description: Description of product.
+         display_name:
+           type: string
+           description: Display name of product.
+     ZZZSeriesList:
+       type: array
+       items:
+         $ref: '#/definitions/ZZZSeries'
+     ZZZSeries:
+       type: object
+       properties:
+         series_id:
+           type: string
+           description: Unique ID.
+         display_name:
+           type: string
+           description: Display name of series.
+         products:
+           type: array
+           items:
+             $ref: '#/definitions/ZZZProduct'
+           description: Display name of series.
+   responses:
+     UnexpectedError:
+       description: Unexpected error
+       schema:
+         $ref: '#/definitions/Error'
+   paths:
+     /products:
+       get:
+         summary: Product Types
+         description: <description>
+         responses:
+           200:
+             description: An array of products
+             schema:
+               $ref: '#/definitions/ZZZProductList'
+           default:
+             $ref: '#/responses/UnexpectedError'
+     /seriess:
+       get:
+         summary: Series Types
+         description: <description>
+         responses:
+           200:
+             description: An array of seriess
+             schema:
+               $ref: '#/definitions/ZZZSeriesList'
+           default:
+             $ref: '#/responses/UnexpectedError'
