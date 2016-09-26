@@ -32,7 +32,6 @@ def construct_odict(loader, node):
 
 
 def setup():
-    yaml.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
-                         lambda loader, node: OrderedDict(loader.construct_pairs(node)))
-    yaml.add_representer(OrderedDict, represent_odict)
+    yaml.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, construct_odict)
     yaml.add_constructor(u'tag:yaml.org,2002:map', construct_odict)
+    yaml.add_representer(OrderedDict, represent_odict)
