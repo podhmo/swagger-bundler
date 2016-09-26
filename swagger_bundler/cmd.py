@@ -18,13 +18,17 @@ def main(ctx_):
 
 
 def _prepare():
-    config_path = configuration.pickup_config(os.getcwd()) or "~/.{}".format(configuration.CONFIG_NAME)
-    if not os.path.exists(config_path):
-        return _on_config_file_is_not_found()
-    parser = configuration.load_config(config_path)
+    parser = _get_config_parser()
     ctx = make_rootcontext_from_configparser(parser)
     ordering.setup()
     return ctx
+
+
+def _get_config_parser():
+    config_path = configuration.pickup_config(os.getcwd()) or "~/.{}".format(configuration.CONFIG_NAME)
+    if not os.path.exists(config_path):
+        return _on_config_file_is_not_found()
+    return configuration.load_config(config_path)
 
 
 @main.command()
@@ -73,6 +77,41 @@ def concat(files, input, output):
     ctx = _prepare()
     loading.setup(output=output, input=input)
     composing.run(ctx, files, sys.stdout)
+
+
+@main.command()
+def init():
+    parser = _get_config_parser()
+    template = """\
+# special marker for swagger-bundler
+# {c[special_marker][namespace]}:
+# {c[special_marker][compose]}:
+# {c[special_marker][concat]}:
+
+# specification: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
+# sample: http://editor.swagger.io/#/
+
+swagger: {c[template][swagger]!r}
+info:
+  title: {c[template][info_title]}
+  description: {c[template][info_description]}
+  version: {c[template][info_version]}
+host: {c[template][host]}
+schemes:
+- {c[template][schemes]}
+basePath: {c[template][basePath]}
+produces:
+-  {c[template][produces]}
+consumes:
+-  {c[template][produces]}
+
+definitions:
+
+responses:
+
+paths:
+"""
+    sys.stdout.write(template.format(c=parser))
 
 
 def _on_config_file_is_not_found():

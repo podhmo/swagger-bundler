@@ -37,12 +37,24 @@ def pickup_config(start_path=None, default=None):
 def init_config(path):
     template = """\
 [DEFAULT]
+
 [special_marker]
 # todo: gentle description.
 namespace = x-bundler-namespace
 compose = x-bundler-compose
 concat = x-bundler-concat
 exposed = x-bundler-exposed
+
+[template]
+swagger = 2.0
+info_title = <api title>
+info_description = <description>
+info_version =  0.0.0
+host = localhost
+schemes = http
+basePath = /
+produces = application/json
+consumes = application/json
 """
     sys.stderr.write("generate {}.\n".format(path))
     sys.stderr.flush()
