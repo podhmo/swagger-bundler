@@ -57,7 +57,7 @@ swagger-bundler has two commands.
 bundle
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is the main feature. generating bundled swagger-definition file.
+This is the main feature. bundling many source files into one single swagger-definition file.
 
 ::
 
