@@ -7,7 +7,7 @@ from swagger_bundler import config as configuration
 import swagger_bundler.ordering as ordering
 import swagger_bundler.bundling as bundling
 import swagger_bundler.composing as composing
-import swagger_bundler.validation as validation
+import swagger_bundler.loading as loading
 
 
 @click.group()
@@ -44,9 +44,12 @@ def config(file, init):
 
 @main.command(help="bundle yaml")
 @click.argument("file", required=True, type=click.Path(exists=True))
+@click.option("--input", type=click.Choice([loading.Format.yaml, loading.Format.json]))
+@click.option("--output", type=click.Choice([loading.Format.yaml, loading.Format.json]))
 @click.option("--log/--", default=False)  # TODO: まじめに
-def bundle(file, log):
+def bundle(file, input, output, log):
     ctx = _prepare()
+    loading.setup(output=output, input=input)
     if log:
         import logging
         logging.basicConfig(level=logging.DEBUG)
@@ -57,14 +60,18 @@ def bundle(file, log):
 @main.command()
 @click.argument("file", required=True, type=click.Path(exists=True))
 def validate(file):
+    import swagger_bundler.validation as validation
     with open(file) as rf:
         validation.run(rf, sys.stdout)
 
 
 @main.command()
 @click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
-def concat(files):
+@click.option("--input", type=click.Choice([loading.Format.yaml, loading.Format.json]))
+@click.option("--output", type=click.Choice([loading.Format.yaml, loading.Format.json]))
+def concat(files, input, output):
     ctx = _prepare()
+    loading.setup(output=output, input=input)
     composing.run(ctx, files, sys.stdout)
 
 
