@@ -23,4 +23,4 @@ def run(ctx, inp, outp):
     subcontext = ctx.make_subcontext_from_port(inp)
     result = transform(subcontext, subcontext.data)
     ordered = ordering(result)
-    loading.dump(ordered, outp, allow_unicode=True, default_flow_style=False)
+    loading.dump(ordered, outp)

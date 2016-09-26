@@ -125,4 +125,4 @@ def run(ctx, inp, outp, namespace=None):
     namespace = namespace or subcontext.detector.detect_name()
     result = transform(subcontext, subcontext.data, namespace=namespace)
     ordered = ordering(result)
-    loading.dump(ordered, outp, allow_unicode=True, default_flow_style=False)
+    loading.dump(ordered, outp)

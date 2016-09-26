@@ -57,4 +57,4 @@ def transform(ctx, fulldata, files):
 def run(ctx, files, outp):
     result = transform(ctx, make_dict(), files)
     ordered = ordering(result)
-    loading.dump(ordered, outp, allow_unicode=True, default_flow_style=False)
+    loading.dump(ordered, outp)
