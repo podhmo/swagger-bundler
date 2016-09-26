@@ -1,0 +1,3 @@
+x-bundler-namespace: ZZZ
+x-bundler-compose:
+  - ./parts/y.yaml
