@@ -1,7 +1,7 @@
 swagger-bundler
 ========================================
 
-this is individual tool for bundling swagger definitions.
+This is individual tool for bundling swagger definitions.
 
 - python3 only (python3.5+ is better)
 
@@ -22,8 +22,8 @@ or
 getting started
 ----------------------------------------
 
-0. generate your config file
-1. use it
+0. generating your config file
+1. using it
 
 0. generating your config file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -35,16 +35,16 @@ swagger-bundler needs config file for using. so, at first, you must generate con
    $ swagger-bundler config --init
    generate ~/venv/web/work/swagger-bundler.ini.
 
-the stragegy of finding config file, following below.
+The stragegy of finding config file, following below.
 
-your current working directory is `~/venv/web/work/`. then,
+Your current working directory is `~/venv/web/work/`. then,
 
-1. find `~/venv/web/work/swagger-bundler.ini`
-2. find `~/venv/web/swagger-bundler.ini`
-3. find `~/venv/swagger-bundler.ini`
-4. find `~/swagger-bundler.ini`
+1. finds `~/venv/web/work/swagger-bundler.ini`
+2. finds `~/venv/web/swagger-bundler.ini`
+3. finds `~/venv/swagger-bundler.ini`
+4. finds `~/swagger-bundler.ini`
 
-config file is not found. then lookup `~/.swagger-bundle.ini`.
+Config file is not found, then, lookup `~/.swagger-bundle.ini`.
 
 1. how to use
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -63,7 +63,7 @@ config file is not found. then lookup `~/.swagger-bundle.ini`.
     validate  validates via swagger-2.0 spec
 
 
-swagger-bundler has two commands.
+Swagger-bundler has two commands.
 
 - bundle
 - concat
@@ -83,7 +83,7 @@ The target file of swagger-bundler, it can use three special-marker.
 - x-bundler-compose -- importing from other files with namespace
 - x-bundler-concat -- importing from other files **without namespace**
 
-For example. the structure of current working directory is such as below.
+For example. the structure of current working directory is such as below,
 
 ::
 
@@ -107,7 +107,7 @@ and the content of main.yaml is this.
   x-bundler-concat:
     - ./parts/common.yaml
 
-and run it.
+And run it.
 
 .. code-block:: bash
 
@@ -116,7 +116,7 @@ and run it.
 - definitions in x.yaml, y.yaml are renamed (with namespace). (e.g. foo -> ZZZFoo)
 - definitions in common.yaml are not renamed. (e.g. bar -> bar)
 
-link of `example <example.rst>`_.
+The link of `example <example.rst>`_.
 
 concat
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
