@@ -1,0 +1,33 @@
+x-bundler-concat:
+  - ./common.yaml
+
+paths:
+  /products:
+    get:
+      summary: Product Types
+      description: <description>
+      responses:
+        200:
+          description: An array of products
+          schema:
+            $ref: '#/definitions/ProductList'
+        default:
+          $ref: '#/responses/UnexpectedError'
+
+definitions:
+  ProductList:
+    type: array
+    items:
+      $ref: '#/definitions/Product'
+  Product:
+    type: object
+    properties:
+      product_id:
+        type: string
+        description: Unique ID.
+      description:
+        type: string
+        description: Description of product.
+      display_name:
+        type: string
+        description: Display name of product.

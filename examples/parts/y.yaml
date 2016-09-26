@@ -1,0 +1,37 @@
+x-bundler-concat:
+  - ./common.yaml
+x-bundler-compose:
+  - x.yaml
+
+paths:
+  /seriess:
+    get:
+      summary: Series Types
+      description: <description>
+      responses:
+        200:
+          description: An array of seriess
+          schema:
+            $ref: '#/definitions/SeriesList'
+        default:
+          $ref: '#/responses/UnexpectedError'
+
+definitions:
+  SeriesList:
+    type: array
+    items:
+      $ref: '#/definitions/Series'
+  Series:
+    type: object
+    properties:
+      series_id:
+        type: string
+        description: Unique ID.
+      display_name:
+        type: string
+        description: Display name of series.
+      products:
+        type: array
+        items:
+          $ref: "#/definitions/Product"
+        description: Display name of series.

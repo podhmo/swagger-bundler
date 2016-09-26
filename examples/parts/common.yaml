@@ -1,0 +1,13 @@
+responses:
+  UnexpectedError:
+    description: Unexpected error
+    schema:
+      $ref: '#/definitions/Error'
+
+definitions:
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
