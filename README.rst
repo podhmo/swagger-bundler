@@ -93,7 +93,11 @@ and the content of main.yaml is this.
   x-bundler-concat:
     - ./parts/common.yaml
 
-and running `swagger-bundler bundle main.yaml`, then.
+and runn it.
+
+.. code-block:: bash
+
+ $ swagger-bundler bundle main.yaml
 
 - definitions in x.yaml, y.yaml are renamed (with namespace). (e.g. foo -> ZZZFoo)
 - definitions in common.yaml are not renamed. (e.g. bar -> bar)
