@@ -27,9 +27,9 @@ def _prepare():
     return ctx
 
 
-@main.command()
+@main.command(help="show config")
 @click.argument("file", required=False, default=None)
-@click.option("--init/--", default=False)
+@click.option("--init/--", help="generates ini file", default=False)
 def config(file, init):
     config_path = configuration.pickup_config(os.getcwd(), default=None)
     if init:
@@ -42,11 +42,11 @@ def config(file, init):
         return configuration.describe_config(config, sys.stdout)
 
 
-@main.command(help="bundle yaml")
+@main.command(help="bundles many source files into single file")
 @click.argument("file", required=True, type=click.Path(exists=True))
-@click.option("--input", type=click.Choice([loading.Format.yaml, loading.Format.json]))
-@click.option("--output", type=click.Choice([loading.Format.yaml, loading.Format.json]))
-@click.option("--log/--", default=False)  # TODO: まじめに
+@click.option("--input", help="input format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
+@click.option("--output", help="output format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
+@click.option("--log/--", help="activate logging(for debug)", default=False)  # TODO: まじめに
 def bundle(file, input, output, log):
     ctx = _prepare()
     loading.setup(output=output, input=input)
@@ -57,7 +57,7 @@ def bundle(file, input, output, log):
         bundling.run(ctx, rf, sys.stdout)
 
 
-@main.command()
+@main.command(help="validates via swagger-2.0 spec")
 @click.argument("file", required=True, type=click.Path(exists=True))
 def validate(file):
     import swagger_bundler.validation as validation
@@ -65,10 +65,10 @@ def validate(file):
         validation.run(rf, sys.stdout)
 
 
-@main.command()
+@main.command(help="concatnates many swagger-definition files")
 @click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
-@click.option("--input", type=click.Choice([loading.Format.yaml, loading.Format.json]))
-@click.option("--output", type=click.Choice([loading.Format.yaml, loading.Format.json]))
+@click.option("--input", help="input format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
+@click.option("--output", help="output format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
 def concat(files, input, output):
     ctx = _prepare()
     loading.setup(output=output, input=input)
