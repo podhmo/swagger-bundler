@@ -124,6 +124,14 @@ class Context:
     def path(self):
         return self.resolver.path
 
+    def _on_load_failure(self, src, e=None):
+        if e is not None:
+            sys.stderr.write("{}: {}\n".format(type(e), e))
+        msg = "  on where={!r}, open={!r}\n".format(self.path, src)
+        sys.stderr.write(click.style(msg, bold=True, fg="yellow"))
+        logger.info(msg)
+        sys.stderr.flush()
+
     def make_subcontext(self, src, data=None):
         subresolver = self.resolver.make_subresolver(src)
         if subresolver.path in self.env:
@@ -132,11 +140,12 @@ class Context:
             try:
                 with open(subresolver.path) as rf:
                     data = loading.load(rf)
-            except:
-                msg = "ERROR where={!r}, open={!r}\n".format(self.path, src)
-                sys.stderr.write(click.style(msg, bold=True, fg="yellow"))
-                logger.warning(msg)
-                sys.stderr.flush()
+            except (FileNotFoundError, IsADirectoryError) as e:
+                self._on_load_failure(src, e=e)
+                sys.stderr.write("give up..\n")
+                sys.exit(-1)
+            except Exception as e:
+                self._on_load_failure(src, e=e)
                 raise
 
         subconfig = self.env.option_scanner.scan(data)
