@@ -49,6 +49,20 @@ config file is not found. then lookup `~/.swagger-bundle.ini`.
 1. how to use
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. code-block::
+
+  Usage: swagger-bundler [OPTIONS] COMMAND [ARGS]...
+
+  Options:
+    --help  Show this message and exit.
+
+  Commands:
+    bundle    bundles many source files into single file
+    concat    concatnates many swagger-definition files
+    config    show config
+    validate  validates via swagger-2.0 spec
+
+
 swagger-bundler has two commands.
 
 - bundle
