@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import os.path
 import sys
+import click
 import logging
 from . import loading
 logger = logging.getLogger(__name__)
@@ -128,8 +129,15 @@ class Context:
         if subresolver.path in self.env:
             return self.env[subresolver.path]
         if data is None:
-            with open(subresolver.path) as rf:
-                data = loading.load(rf)
+            try:
+                with open(subresolver.path) as rf:
+                    data = loading.load(rf)
+            except:
+                msg = "ERROR where={!r}, open={!r}\n".format(self.path, src)
+                sys.stderr.write(click.style(msg, bold=True, fg="yellow"))
+                logger.warning(msg)
+                sys.stderr.flush()
+                raise
 
         subconfig = self.env.option_scanner.scan(data)
         subdetector = self.detector.__class__(subconfig)
