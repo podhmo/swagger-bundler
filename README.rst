@@ -118,6 +118,23 @@ And run it.
 
 The link of `example <example.rst>`_.
 
+
+qualified import.
+
+.. code-block:: yaml
+
+  x-bundler-namespace: O
+  x-bundler-compose:
+    - ../parts/x-state.yaml as X
+    - ../parts/y-state.yaml as Y
+
+then
+
+- state of x-state.yaml is converting XState, eventually, OXState
+- state of y-state.yaml is converting YState, eventually, OYState
+
+the link of `example(qualified import) <example2.rst>`_
+
 concat
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
