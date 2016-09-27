@@ -44,17 +44,18 @@ def config(file, init):
 
 @main.command(help="bundles many source files into single file")
 @click.argument("file", required=True, type=click.Path(exists=True))
+@click.option("--namespace", help="namespace", default=None)
 @click.option("--input", help="input format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
 @click.option("--output", help="output format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
 @click.option("--log/--", help="activate logging(for debug)", default=False)  # TODO: まじめに
-def bundle(file, input, output, log):
+def bundle(file, namespace, input, output, log):
     ctx = _prepare()
     loading.setup(output=output, input=input)
     if log:
         import logging
         logging.basicConfig(level=logging.DEBUG)
     with open(file) as rf:
-        bundling.run(ctx, rf, sys.stdout)
+        bundling.run(ctx, rf, sys.stdout, namespace=namespace)
 
 
 @main.command(help="validates via swagger-2.0 spec")

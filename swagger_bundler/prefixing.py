@@ -96,7 +96,7 @@ def _get_exposed_detail(ctx):
                 continue
             else:
                 detail[subpath].update(subpair)
-    logger.debug("ignore prefixer detail: %s", detail)
+    logger.debug("exposed detail: %s", detail)
     return detail
 
 
@@ -115,7 +115,7 @@ def transform(ctx, data, namespace=None):
         return data
 
     exposed_predicate = get_exposed_predicate(ctx)
-    logger.debug("transform: namespace=%s, ignore=%s", namespace, exposed_predicate)
+    logger.debug("transform: identifier=%s, namespace=%s, ignore=%s", ctx.identifier, namespace, exposed_predicate)
     prefixer = Prefixer(namespace, exposed_predicate)
     return prefixer.add_prefix(data)
 

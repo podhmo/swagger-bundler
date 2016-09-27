@@ -5,6 +5,7 @@ import sys
 import click
 import logging
 from . import loading
+from . import bundling
 logger = logging.getLogger(__name__)
 
 
@@ -79,6 +80,9 @@ class Detector:
     def detect_namespace(self):
         return self.config.get("namespace")
 
+    def update_compose(self, newval):
+        self.config["compose"] = newval
+
     def init_compose(self):
         v = self.config.get("compose")
         if not v:
@@ -98,10 +102,7 @@ class PathResolver:
     def __init__(self, path, ns=None):
         self.path = path
         self.ns = ns
-
-    @property  # reify?
-    def identifier(self):
-        return (self.path, self.ns)
+        self.identifier = (path, ns)
 
     def make_subresolver(self, src):
         abspath, ns = self.resolve_identifier(src)
@@ -155,8 +156,8 @@ class Context:
 
     def make_subcontext(self, src, data=None):
         subresolver = self.resolver.make_subresolver(src)
-        if subresolver.path in self.env:
-            return self.env[subresolver.path]
+        if subresolver.identifier in self.env:
+            return self.env[subresolver.identifier]
         if data is None:
             try:
                 with open(subresolver.path) as rf:
@@ -177,6 +178,15 @@ class Context:
         logger.debug("make context: config=%s", subdetector.config)
         subcontext = self.__class__(self.env, subdetector, subresolver, data)
         self.env.register_context(subcontext)
+
+        # on qualified import
+        ns = subcontext.resolver.ns
+        if ns is not None:
+            subcontext.data = bundling.transform(subcontext, subcontext.data, namespace=ns)
+            # update compose targets list.
+            exposed_list = subcontext.detector.detect_exposed()
+            new_compose_target_list = [c for c in subcontext.detector.detect_compose() if c in exposed_list]
+            subcontext.detector.update_compose(new_compose_target_list)
         return subcontext
 
     def make_subcontext_from_port(self, port):
