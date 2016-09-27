@@ -1,3 +1,9 @@
+0.0.4
+
+- gentle warning message on FileNotFoundError
+- bundle command with `--namespace` option
+- qualified import (e.g. x-bundler-compose with 'foo.yaml as F')
+
 0.0.3
 
 - adding readme and examples
