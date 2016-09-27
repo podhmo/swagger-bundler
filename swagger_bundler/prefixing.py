@@ -78,12 +78,12 @@ class Prefixer:
 def _get_exposed_detail(ctx):
     # Dict[path, {"responses", "definitions"}]
     detail = defaultdict(dict)
-    detail[ctx.path] = {
+    detail[ctx.identifier] = {
         "responses": set(ctx.data.get("responses", {}).keys()),
         "definitions": set(ctx.data.get("definitions", {}).keys())
     }
-    ignore_path_set = {ctx.resolver.resolve_path(fname) for fname in ctx.detector.detect_exposed()}
-    compose_path_set = {ctx.resolver.resolve_path(fname) for fname in ctx.detector.detect_compose()}
+    ignore_path_set = {ctx.resolver.resolve_identifier(fname) for fname in ctx.detector.detect_exposed()}
+    compose_path_set = {ctx.resolver.resolve_identifier(fname) for fname in ctx.detector.detect_compose()}
 
     # sub relation
     for fname in ctx.detector.detect_compose():
@@ -103,7 +103,7 @@ def _get_exposed_detail(ctx):
 def get_exposed_predicate(ctx):
     predicate = {"responses": set(), "definitions": set()}
     detail = _get_exposed_detail(ctx)
-    detail.pop(ctx.path)
+    detail.pop(ctx.identifier)
     for pair in detail.values():
         predicate["responses"].update(pair["responses"])
         predicate["definitions"].update(pair["definitions"])

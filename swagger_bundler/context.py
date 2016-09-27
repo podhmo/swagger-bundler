@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+import re
 import os.path
 import sys
 import click
@@ -92,12 +93,28 @@ class Detector:
 
 
 class PathResolver:
-    def __init__(self, path):
+    IDENTIFIER_RX = re.compile("^(\S+)\s+as\s+(\S+)$")  # e.g. "foo.yaml as F"
+
+    def __init__(self, path, ns=None):
         self.path = path
+        self.ns = ns
+
+    @property  # reify?
+    def identifier(self):
+        return (self.path, self.ns)
 
     def make_subresolver(self, src):
-        abspath = self.resolve_path(src)
-        return self.__class__(abspath)
+        abspath, ns = self.resolve_identifier(src)
+        return self.__class__(abspath, ns=ns)
+
+    def resolve_identifier(self, src):
+        # identifier = path + ns
+        # "foo.yaml as F" is path="foo.yaml", ns="F"
+        m = self.IDENTIFIER_RX.search(src)
+        if m is not None:
+            return self.resolve_path(m.group(1)), m.group(2)
+        else:
+            return self.resolve_path(src), None
 
     def resolve_path(self, src):
         if os.path.isabs(src):
@@ -123,6 +140,10 @@ class Context:
     @property
     def path(self):
         return self.resolver.path
+
+    @property
+    def identifier(self):
+        return self.resolver.identifier
 
     def _on_load_failure(self, src, e=None):
         if e is not None:
