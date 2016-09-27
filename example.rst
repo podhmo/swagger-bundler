@@ -119,7 +119,7 @@ y.yaml
              $ref: "#/definitions/Product"
            description: Display name of series.
 
-generated.yaml
+## generated.yaml
 
 .. code-block:: yaml
 

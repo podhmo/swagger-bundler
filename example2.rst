@@ -71,6 +71,7 @@ parts/verify-state.yaml
             - ok
             - ng
 
+parts/type.yaml
 
 .. code-block:: yaml
 
@@ -80,3 +81,49 @@ parts/verify-state.yaml
       enum:
         - active
         - inactive
+
+## generated.yaml
+
+.. code-block:: yaml
+
+  definitions:
+    type:
+      type: string
+      enum:
+      - active
+      - inactive
+    MyHState:
+      properties:
+        type:
+          $ref: '#/definitions/type'
+        status:
+          type: string
+          enum:
+          - hungry
+          - angry
+          - sad
+          - happy
+          - dead
+    MyVType:
+      type: string
+      enum:
+      - active
+      - inactive
+    MyVState:
+      properties:
+        type:
+          $ref: '#/definitions/MyVType'
+        status:
+          type: string
+          enum:
+          - ok
+          - ng
+    MyManager:
+      type: object
+      properties:
+        name:
+          type: string
+        humanState:
+          $ref: '#/definitions/MyHState'
+        state:
+          $ref: '#/definitions/MyVState'
