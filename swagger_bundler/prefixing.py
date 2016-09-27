@@ -78,12 +78,12 @@ class Prefixer:
 def _get_exposed_detail(ctx):
     # Dict[path, {"responses", "definitions"}]
     detail = defaultdict(dict)
-    detail[ctx.path] = {
+    detail[ctx.identifier] = {
         "responses": set(ctx.data.get("responses", {}).keys()),
         "definitions": set(ctx.data.get("definitions", {}).keys())
     }
-    ignore_path_set = {ctx.resolver.resolve_path(fname) for fname in ctx.detector.detect_exposed()}
-    compose_path_set = {ctx.resolver.resolve_path(fname) for fname in ctx.detector.detect_compose()}
+    ignore_path_set = {ctx.resolver.resolve_identifier(fname) for fname in ctx.detector.detect_exposed()}
+    compose_path_set = {ctx.resolver.resolve_identifier(fname) for fname in ctx.detector.detect_compose()}
 
     # sub relation
     for fname in ctx.detector.detect_compose():
@@ -96,14 +96,14 @@ def _get_exposed_detail(ctx):
                 continue
             else:
                 detail[subpath].update(subpair)
-    logger.debug("ignore prefixer detail: %s", detail)
+    logger.debug("exposed detail: %s", detail)
     return detail
 
 
 def get_exposed_predicate(ctx):
     predicate = {"responses": set(), "definitions": set()}
     detail = _get_exposed_detail(ctx)
-    detail.pop(ctx.path)
+    detail.pop(ctx.identifier)
     for pair in detail.values():
         predicate["responses"].update(pair["responses"])
         predicate["definitions"].update(pair["definitions"])
@@ -115,7 +115,7 @@ def transform(ctx, data, namespace=None):
         return data
 
     exposed_predicate = get_exposed_predicate(ctx)
-    logger.debug("transform: namespace=%s, ignore=%s", namespace, exposed_predicate)
+    logger.debug("transform: identifier=%s, namespace=%s, ignore=%s", ctx.identifier, namespace, exposed_predicate)
     prefixer = Prefixer(namespace, exposed_predicate)
     return prefixer.add_prefix(data)
 

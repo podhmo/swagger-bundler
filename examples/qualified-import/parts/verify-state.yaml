@@ -1,0 +1,14 @@
+x-bundler-compose:
+  - type.yaml
+
+definitions:
+  state:
+    properties:
+      type:
+        $ref: "#/definitions/type"
+      status:
+        type: string
+        enum:
+          - ok
+          - ng
+

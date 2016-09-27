@@ -1,0 +1,15 @@
+x-bundler-namespace: My
+x-bundler-compose:
+  - parts/human-state.yaml as H
+  - parts/verify-state.yaml as V
+
+definitions:
+  manager:
+    type: object
+    properties:
+      name:
+        type: string
+      humanState:
+        $ref: '#/definitions/HState'
+      state:
+        $ref: '#/definitions/VState'

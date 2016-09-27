@@ -1,0 +1,6 @@
+definitions:
+  type:
+    type: string
+    enum:
+      - active
+      - inactive

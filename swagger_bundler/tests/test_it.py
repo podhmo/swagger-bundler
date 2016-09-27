@@ -69,4 +69,14 @@ class GenerationgTests(unittest.TestCase):
             expected = yaml.load(rf)
         self.assertEqual(result, expected)
 
-    # todo: add prefixed import
+    def test_it__qualified_Import(self):
+        # dependencies:
+        # user-state -> {x-state as X -> {type[exposed]}, y-state as Y -> {type}}
+        ctx = self._makeRootContext()
+
+        with open(os.path.join(here, "data/rel/use-state.yaml")) as rf:
+            subcontext = ctx.make_subcontext_from_port(rf)
+            result = self._callFUT(subcontext, subcontext.data)
+        with open(os.path.join(here, "data/ouse-state.yaml")) as rf:
+            expected = yaml.load(rf)
+        self.assertEqual(result, expected)

@@ -1,0 +1,15 @@
+x-bundler-namespace: O
+x-bundler-compose:
+  - ../parts/x-state.parts.yaml as X
+  - ../parts/y-state.parts.yaml as Y
+
+definitions:
+  manager:
+    type: object
+    properties:
+      name:
+        type: string
+      humanState:
+        $ref: '#/definitions/XState'
+      state:
+        $ref: '#/definitions/YState'

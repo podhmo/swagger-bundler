@@ -1,9 +1,11 @@
 # -*- coding:utf-8 -*-
+import re
 import os.path
 import sys
 import click
 import logging
 from . import loading
+from . import bundling
 logger = logging.getLogger(__name__)
 
 
@@ -78,6 +80,9 @@ class Detector:
     def detect_namespace(self):
         return self.config.get("namespace")
 
+    def update_compose(self, newval):
+        self.config["compose"] = newval
+
     def init_compose(self):
         v = self.config.get("compose")
         if not v:
@@ -92,12 +97,25 @@ class Detector:
 
 
 class PathResolver:
-    def __init__(self, path):
+    IDENTIFIER_RX = re.compile("^(\S+)\s+as\s+(\S+)$")  # e.g. "foo.yaml as F"
+
+    def __init__(self, path, ns=None):
         self.path = path
+        self.ns = ns
+        self.identifier = (path, ns)
 
     def make_subresolver(self, src):
-        abspath = self.resolve_path(src)
-        return self.__class__(abspath)
+        abspath, ns = self.resolve_identifier(src)
+        return self.__class__(abspath, ns=ns)
+
+    def resolve_identifier(self, src):
+        # identifier = path + ns
+        # "foo.yaml as F" is path="foo.yaml", ns="F"
+        m = self.IDENTIFIER_RX.search(src)
+        if m is not None:
+            return self.resolve_path(m.group(1)), m.group(2)
+        else:
+            return self.resolve_path(src), None
 
     def resolve_path(self, src):
         if os.path.isabs(src):
@@ -124,6 +142,10 @@ class Context:
     def path(self):
         return self.resolver.path
 
+    @property
+    def identifier(self):
+        return self.resolver.identifier
+
     def _on_load_failure(self, src, e=None):
         if e is not None:
             sys.stderr.write("{}: {}\n".format(type(e), e))
@@ -134,8 +156,8 @@ class Context:
 
     def make_subcontext(self, src, data=None):
         subresolver = self.resolver.make_subresolver(src)
-        if subresolver.path in self.env:
-            return self.env[subresolver.path]
+        if subresolver.identifier in self.env:
+            return self.env[subresolver.identifier]
         if data is None:
             try:
                 with open(subresolver.path) as rf:
@@ -156,6 +178,15 @@ class Context:
         logger.debug("make context: config=%s", subdetector.config)
         subcontext = self.__class__(self.env, subdetector, subresolver, data)
         self.env.register_context(subcontext)
+
+        # on qualified import
+        ns = subcontext.resolver.ns
+        if ns is not None:
+            subcontext.data = bundling.transform(subcontext, subcontext.data, namespace=ns)
+            # update compose targets list.
+            exposed_list = subcontext.detector.detect_exposed()
+            new_compose_target_list = [c for c in subcontext.detector.detect_compose() if c in exposed_list]
+            subcontext.detector.update_compose(new_compose_target_list)
         return subcontext
 
     def make_subcontext_from_port(self, port):

@@ -1,0 +1,41 @@
+definitions:
+  type:
+    type: string
+    enum:
+    - active
+    - inactive
+  OXState:
+    properties:
+      type:
+        $ref: '#/definitions/type'
+      status:
+        type: string
+        enum:
+        - hungry
+        - angry
+        - sad
+        - happy
+        - dead
+  OYType:
+    type: string
+    enum:
+    - active
+    - inactive
+  OYState:
+    properties:
+      type:
+        $ref: '#/definitions/OYType'
+      status:
+        type: string
+        enum:
+        - ok
+        - ng
+  OManager:
+    type: object
+    properties:
+      name:
+        type: string
+      humanState:
+        $ref: '#/definitions/OXState'
+      state:
+        $ref: '#/definitions/OYState'
