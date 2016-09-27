@@ -36,6 +36,7 @@ parts/human-state.yaml
 
 .. code-block:: yaml
 
+  # not x-bundler-compose
   x-bundler-concat:
     - type.yaml
 
