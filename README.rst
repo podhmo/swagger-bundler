@@ -143,3 +143,18 @@ This is just concatnate files.
 ::
 
    $ swagger-bundler concat [file1.yaml] [file2.yaml] ...
+
+
+appendix:
+----------------------------------------
+
+- `watch` option is supported.
+
+watch option
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+   # installed with [watch]
+   $ pip install "swagger-bundler[watch]"
+   $ swagger-bundler bundle --watch "*.yaml" --outfile="/tmp/output.yaml" src.yaml
