@@ -53,6 +53,8 @@ exposed = x-bundler-exposed
 # a/b/c/d.py:function_name
 compose =
 bundle =
+add_namespace =
+validate =
 """
     sys.stderr.write("generate {}.\n".format(path))
     sys.stderr.flush()

@@ -92,7 +92,7 @@ def check_json(json_object, schema, context=None):
             return "Schema check failed.\n{}".format(report)
 
 
-def run(inp, out):
+def run(ctx, inp, out):
     here = os.path.abspath(os.path.dirname(__file__))
     schema_path = os.path.join(here, "schema/swagger-2.0.json")
 
@@ -117,3 +117,8 @@ def run(inp, out):
         else:
             return d
     out.write(str(check_json(fix(data), schema)))
+
+    # TODO: handling code
+    postscript = ctx.options["postscript_hook"].get("validate")
+    if postscript and callable(postscript):
+        postscript(ctx, data, last=True)

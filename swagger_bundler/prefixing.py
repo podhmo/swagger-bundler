@@ -97,19 +97,27 @@ def get_exposed_predicate(ctx, prefixing_targets):
     return predicate
 
 
-def transform(ctx, data, namespace=None):
+def transform(ctx, data, namespace=None, last=False):
     if namespace is None:
         return data
     prefixing_targets = ctx.options["prefixing_targets"]
     exposed_predicate = get_exposed_predicate(ctx, prefixing_targets)
     logger.debug("transform: identifier=%s, namespace=%s, ignore=%s", ctx.identifier, namespace, exposed_predicate)
     prefixer = Prefixer(namespace, exposed_predicate, prefixing_targets)
-    return prefixer.add_prefix(data)
+    result = prefixer.add_prefix(data)
+
+    # TODO: handling code
+    postscript = ctx.options["postscript_hook"].get("add_namespace")
+    if postscript and callable(postscript):
+        postscript_result = postscript(ctx, result, last=last)
+        if postscript_result is not None:
+            result = postscript_result
+    return result
 
 
 def run(ctx, inp, outp, namespace=None):
     subcontext = ctx.make_subcontext_from_port(inp)
     namespace = namespace or subcontext.detector.detect_name()
-    result = transform(subcontext, subcontext.data, namespace=namespace)
+    result = transform(subcontext, subcontext.data, namespace=namespace, last=True)
     ordered = ordering(result)
     loading.dump(ordered, outp)

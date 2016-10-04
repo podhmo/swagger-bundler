@@ -15,7 +15,7 @@ def transform(ctx, data, namespace=None, last=False):
 
     namespace = namespace or ctx.detector.detect_namespace()
     if namespace:
-        data = prefixing.transform(ctx, data, namespace=namespace)
+        data = prefixing.transform(ctx, data, namespace=namespace, last=last)
 
     # TODO: handling code
     postscript = ctx.options["postscript_hook"].get("bundle")

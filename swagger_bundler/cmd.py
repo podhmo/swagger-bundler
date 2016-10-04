@@ -80,7 +80,8 @@ def bundle(file, namespace, input, output, watch, no_watch, outfile, log):
 def validate(file):
     import swagger_bundler.validation as validation
     with open(file) as rf:
-        validation.run(rf, sys.stdout)
+        ctx = _prepare()
+        validation.run(ctx, rf, sys.stdout)
 
 
 @main.command(help="concatnates many swagger-definition files")
