@@ -2,10 +2,12 @@ import click
 import sys
 import time
 import logging
+import os.path
 logger = logging.getLogger(__name__)
 
 
-def do_watch(fn, path, pattern, ignore_pattern=None):
+def do_watch(fn, path, pattern, ignore_pattern=None, outfile=None):
+    outfile = outfile and os.path.normpath(outfile)
     try:
         from watchdog.observers import Observer
         from watchdog.events import PatternMatchingEventHandler
@@ -27,11 +29,14 @@ please run `pip install "swagger_bundler[watch]`
                 logger.warn("exception", exc_info=True)
 
         def on_any_event(self, event):
-            self.process(event)
+            if outfile is None or outfile != os.path.normpath(event.src_path):
+                self.process(event)
 
     observer = Observer()
     patterns = [pattern]
-    ignore_patterns = [ignore_pattern] if ignore_pattern else []
+    ignore_patterns = []
+    if ignore_pattern is not None:
+        ignore_patterns.append(ignore_pattern)
     sys.stderr.write("watch starting patterns={}, ignore_patterns={}\n".format(patterns, ignore_patterns))
     callback_handler = _CallbackHandler(patterns=patterns, ignore_patterns=ignore_patterns)
 

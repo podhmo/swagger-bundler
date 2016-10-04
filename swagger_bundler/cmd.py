@@ -72,7 +72,7 @@ def bundle(file, namespace, input, output, watch, no_watch, outfile, log):
         if outfile is None:
             sys.stderr.write(click.style("--outfile is not set\n", bold=True, fg="yellow"))
         from swagger_bundler.watch import do_watch
-        return do_watch(run, path=".", pattern=watch, ignore_pattern=no_watch)
+        return do_watch(run, path=".", pattern=watch, ignore_pattern=no_watch, outfile=outfile)
 
 
 @main.command(help="validates via swagger-2.0 spec")
