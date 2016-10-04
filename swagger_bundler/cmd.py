@@ -47,15 +47,31 @@ def config(file, init):
 @click.option("--namespace", help="namespace", default=None)
 @click.option("--input", help="input format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
 @click.option("--output", help="output format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
+@click.option("--watch/--nowatch", help="watch files(glob)", default=False)
 @click.option("--log/--", help="activate logging(for debug)", default=False)  # TODO: まじめに
-def bundle(file, namespace, input, output, log):
-    ctx = _prepare()
+def bundle(file, namespace, input, output, watch, log):
     loading.setup(output=output, input=input)
     if log:
         import logging
         logging.basicConfig(level=logging.DEBUG)
-    with open(file) as rf:
-        bundling.run(ctx, rf, sys.stdout, namespace=namespace)
+
+    def run():
+        ctx = _prepare()
+        with open(file) as rf:
+            bundling.run(ctx, rf, sys.stdout, namespace=namespace)
+
+    if not watch:
+        run()
+    else:
+        try:
+            import watchdog
+        except ImportError:
+            msg = """\
+watch dog is not found.
+please run `pip install "swagger_bundler[watch]`
+"""
+            sys.stderr.write(click.style(msg, bold=True, fg="yellow"))
+
 
 
 @main.command(help="validates via swagger-2.0 spec")
