@@ -34,8 +34,12 @@ validation_extras = [
     "jsonschema"
 ]
 
+watch_extras = [
+    "watchdog"
+]
+
 setup(name='swagger-bundler',
-      version='0.0.4',
+      version='0.0.5',
       description='swagger schema bundler',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
@@ -54,7 +58,8 @@ setup(name='swagger-bundler',
       extras_require={
           'testing': testing_extras,
           'docs': docs_extras,
-          "validation": validation_extras
+          "validation": validation_extras,
+          "watch": watch_extras,
       },
       tests_require=tests_require,
       test_suite="swagger_bundler.tests",

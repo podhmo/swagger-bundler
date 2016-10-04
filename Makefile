@@ -13,3 +13,6 @@ test:
 
 updatespec:
 	curl http://json.schemastore.org/swagger-2.0 > swagger_bundler/schema/swagger-2.0.json
+
+watch:
+	swagger-bundler bundle ${SRC}/parts/product.parts.yaml --watch=*.yaml --outfile=${SRC}/xproduct.yaml
