@@ -48,7 +48,7 @@ exposed = x-bundler-exposed
 [postscript_hook]
 # lambda ctx, data, *args, **kwargs: do_something()
 ## examples:
-# foo.bar.boo:function_name
+# swagger_bundler.postscript:echo
 # or
 # a/b/c/d.py:function_name
 compose =
