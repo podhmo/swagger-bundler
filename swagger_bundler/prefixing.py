@@ -79,8 +79,8 @@ def _get_exposed_detail(ctx):
     # Dict[path, {"responses", "definitions"}]
     detail = defaultdict(dict)
     detail[ctx.identifier] = {
-        "responses": set(ctx.data.get("responses", {}).keys()),
-        "definitions": set(ctx.data.get("definitions", {}).keys())
+        "responses": set((ctx.data.get("responses") or {}).keys()),
+        "definitions": set((ctx.data.get("definitions") or {}).keys())
     }
     ignore_path_set = {ctx.resolver.resolve_identifier(fname) for fname in ctx.detector.detect_exposed()}
     compose_path_set = {ctx.resolver.resolve_identifier(fname) for fname in ctx.detector.detect_compose()}
