@@ -25,7 +25,7 @@ please run `pip install "swagger_bundler[watch]`
             sys.stderr.write("event detect: event_type={}, src={}\n".format(event.event_type, event.src_path))
             try:
                 return fn()
-            except Exception as e:
+            except:
                 logger.warn("exception", exc_info=True)
 
         def on_any_event(self, event):
@@ -45,7 +45,7 @@ please run `pip install "swagger_bundler[watch]`
     observer.start()
     try:
         while True:
-            time.sleep(1)
+            time.sleep(0.5)
     except KeyboardInterrupt:
         observer.stop()
     try:
