@@ -35,6 +35,9 @@ def fix_data_in_target_section(paths, d, fn):
 
 
 def add_responses_default(ctx, data, *args, **kwargs):
+    if not kwargs.get("last"):
+        return data
+
     def add_default(response):
         if not any(x in response for x in ["default", "$ref"]):
             response["default"] = {"$ref": "::default::"}
