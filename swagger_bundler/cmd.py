@@ -1,6 +1,7 @@
 import sys
 import os.path
 import click
+import logging
 
 from swagger_bundler import make_rootcontext_from_configparser
 from swagger_bundler import config as configuration
@@ -47,12 +48,13 @@ def config(file, init):
 @click.option("--namespace", help="namespace", default=None)
 @click.option("--input", help="input format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
 @click.option("--output", help="output format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
-@click.option("--watch/--nowatch", help="watch files(glob)", default=False)
+@click.option("--watch", help="watch files(glob)", default=None)
+@click.option("--no-watch", help="no watch files(glob)", default=None)
 @click.option("--log/--", help="activate logging(for debug)", default=False)  # TODO: まじめに
-def bundle(file, namespace, input, output, watch, log):
+def bundle(file, namespace, input, output, watch, no_watch, log):
     loading.setup(output=output, input=input)
+
     if log:
-        import logging
         logging.basicConfig(level=logging.DEBUG)
 
     def run():
@@ -63,15 +65,8 @@ def bundle(file, namespace, input, output, watch, log):
     if not watch:
         run()
     else:
-        try:
-            import watchdog
-        except ImportError:
-            msg = """\
-watch dog is not found.
-please run `pip install "swagger_bundler[watch]`
-"""
-            sys.stderr.write(click.style(msg, bold=True, fg="yellow"))
-
+        from swagger_bundler.watch import do_watch
+        return do_watch(run, path=".", pattern=watch, ignore_pattern=no_watch)
 
 
 @main.command(help="validates via swagger-2.0 spec")
