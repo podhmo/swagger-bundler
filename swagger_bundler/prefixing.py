@@ -100,7 +100,8 @@ def get_exposed_predicate(ctx, prefixing_targets):
 def transform(ctx, data, namespace=None):
     if namespace is None:
         return data
-    prefixing_targets = set(["definitions", "responses"])
+    # TODO: config from settings
+    prefixing_targets = set(["definitions", "responses", "parameters"])
     exposed_predicate = get_exposed_predicate(ctx, prefixing_targets)
     logger.debug("transform: identifier=%s, namespace=%s, ignore=%s", ctx.identifier, namespace, exposed_predicate)
     prefixer = Prefixer(namespace, exposed_predicate, prefixing_targets)
