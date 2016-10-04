@@ -1,3 +1,7 @@
+0.0.7
+
+- prefixing targets responses,definisions -> responses,definisions,parameters
+
 0.0.6
 
 - fix case: ctx.data has 'responses' data (but value is None)
