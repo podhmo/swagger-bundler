@@ -24,18 +24,6 @@ please run `pip install "swagger_bundler[watch]`
         def on_any_event(self, event):
             self.process(event)
 
-        def on_modified(self, event):
-            self.process(event)
-
-        def on_created(self, event):
-            self.process(event)
-
-        def on_moved(self, event):
-            self.process(event)
-
-        def on_deleted(self, event):
-            self.process(event)
-
     observer = Observer()
     patterns = [pattern]
     ignore_patterns = [ignore_pattern] if ignore_pattern else []
