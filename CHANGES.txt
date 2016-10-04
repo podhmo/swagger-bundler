@@ -1,3 +1,7 @@
+0.0.5
+
+- watch option is supported
+
 0.0.4
 
 - gentle warning message on FileNotFoundError
