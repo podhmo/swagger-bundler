@@ -50,8 +50,9 @@ def config(file, init):
 @click.option("--output", help="output format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
 @click.option("--watch", help="watch files(glob)", default=None)
 @click.option("--no-watch", help="no watch files(glob)", default=None)
+@click.option("--outfile", help="output file", default=None)
 @click.option("--log/--", help="activate logging(for debug)", default=False)  # TODO: まじめに
-def bundle(file, namespace, input, output, watch, no_watch, log):
+def bundle(file, namespace, input, output, watch, no_watch, outfile, log):
     loading.setup(output=output, input=input)
 
     if log:
@@ -60,11 +61,16 @@ def bundle(file, namespace, input, output, watch, no_watch, log):
     def run():
         ctx = _prepare()
         with open(file) as rf:
-            bundling.run(ctx, rf, sys.stdout, namespace=namespace)
-
+            if outfile:
+                with open(outfile, "w") as wf:
+                    bundling.run(ctx, rf, wf, namespace=namespace)
+            else:
+                bundling.run(ctx, rf, sys.stdout, namespace=namespace)
     if not watch:
         run()
     else:
+        if outfile is None:
+            sys.stderr.write(click.style("--outfile is not set\n", bold=True, fg="yellow"))
         from swagger_bundler.watch import do_watch
         return do_watch(run, path=".", pattern=watch, ignore_pattern=no_watch)
 
