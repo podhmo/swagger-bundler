@@ -39,7 +39,7 @@ def merged(left, right):
     return result
 
 
-def transform(ctx, fulldata, files):
+def transform(ctx, fulldata, files, last=False):
     logger.debug("transform: files=%s", files)
     additional = make_dict()
     for src in files:
@@ -51,10 +51,18 @@ def transform(ctx, fulldata, files):
         subfiles = subcontext.detector.detect_compose()
         if subfiles:
             additional = transform(subcontext, additional, subfiles)
-    return merged(additional, fulldata)
+    result = merged(additional, fulldata)
+
+    # TODO: handling code
+    postscript = ctx.options["postscript_hook"].get("compose")
+    if postscript and callable(postscript):
+        postscript_result = postscript(ctx, result, last=last)
+        if postscript_result is not None:
+            result = postscript_result
+    return result
 
 
 def run(ctx, files, outp):
-    result = transform(ctx, make_dict(), files)
+    result = transform(ctx, make_dict(), files, last=True)
     ordered = ordering(result)
     loading.dump(ordered, outp)

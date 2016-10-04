@@ -37,12 +37,22 @@ def pickup_config(start_path=None, default=None):
 def init_config(path):
     template = """\
 [DEFAULT]
+
 [special_marker]
 # todo: gentle description.
 namespace = x-bundler-namespace
 compose = x-bundler-compose
 concat = x-bundler-concat
 exposed = x-bundler-exposed
+
+[postscript_hook]
+# lambda ctx, data, *args, **kwargs: do_something()
+## examples:
+# swagger_bundler.postscript:echo
+# or
+# a/b/c/d.py:function_name
+compose =
+bundle =
 """
     sys.stderr.write("generate {}.\n".format(path))
     sys.stderr.flush()

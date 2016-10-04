@@ -17,7 +17,8 @@ except IOError:
 
 install_requires = [
     "PyYAML",
-    "click"
+    "click",
+    "magicalimport",
 ]
 
 
