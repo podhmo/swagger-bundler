@@ -46,11 +46,13 @@ concat = x-bundler-concat
 exposed = x-bundler-exposed
 
 [postscript_hook]
+# lambda ctx, data, *args, **kwargs: do_something()
+## examples:
 # foo.bar.boo:function_name
 # or
 # a/b/c/d.py:function_name
-compose = 
-bundle = # swagger_bundler.postscript:echo
+compose =
+bundle =
 """
     sys.stderr.write("generate {}.\n".format(path))
     sys.stderr.flush()
