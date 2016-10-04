@@ -13,9 +13,10 @@ def _titleize(s):
 
 
 class Prefixer:
-    def __init__(self, namespace, exposed_predicate):
+    def __init__(self, namespace, exposed_predicate, prefixing_targets):
         self.namespace = namespace
         self.exposed_predicate = exposed_predicate
+        self.prefixing_targets = prefixing_targets
 
     def add_prefix(self, data):
         return self.transform(data, toplevel=True)
@@ -24,10 +25,8 @@ class Prefixer:
         if hasattr(data, "keys"):
             d = make_dict()
             for k, v in data.items():
-                if k == "definitions":
-                    d[k] = self._transform_definitions(v)
-                elif k == "responses" and toplevel:
-                    d[k] = self._transform_responses(v)
+                if toplevel and k in self.prefixing_targets:
+                    d[k] = self._transform_with_prefixing(k, v)
                 elif k == "$ref":
                     d[k] = self._transform_ref(v)
                 else:
@@ -44,7 +43,7 @@ class Prefixer:
         head, tail = v.rsplit("/", 1)
 
         # exposed
-        for k in ["definitions", "responses"]:
+        for k in self.prefixing_targets:
             if "/{}".format(k) in head and tail in self.exposed_predicate[k]:
                 return v
         return "/".join([head, "{}{}".format(self.namespace, _titleize(tail))])
@@ -54,19 +53,9 @@ class Prefixer:
             return v
         return "{}{}".format(self.namespace, _titleize(v))
 
-    def _transform_definitions(self, data):
+    def _transform_with_prefixing(self, section_name, data):
         d = make_dict()
-        exposeds = self.exposed_predicate["definitions"]
-        for k, v in data.items():
-            if k in exposeds:
-                d[k] = self.transform(v)
-            else:
-                d[self._transform_name(k)] = self.transform(v)
-        return d
-
-    def _transform_responses(self, data):
-        d = make_dict()
-        exposeds = self.exposed_predicate["responses"]
+        exposeds = self.exposed_predicate[section_name]
         for k, v in data.items():
             if k in exposeds:
                 d[k] = self.transform(v)
@@ -75,20 +64,18 @@ class Prefixer:
         return d
 
 
-def _get_exposed_detail(ctx):
+def _get_exposed_detail(ctx, prefixing_targets):
     # Dict[path, {"responses", "definitions"}]
     detail = defaultdict(dict)
-    detail[ctx.identifier] = {
-        "responses": set((ctx.data.get("responses") or {}).keys()),
-        "definitions": set((ctx.data.get("definitions") or {}).keys())
-    }
+    detail[ctx.identifier] = {target_name: set((ctx.data.get(target_name) or {}).keys())
+                              for target_name in prefixing_targets}
     ignore_path_set = {ctx.resolver.resolve_identifier(fname) for fname in ctx.detector.detect_exposed()}
     compose_path_set = {ctx.resolver.resolve_identifier(fname) for fname in ctx.detector.detect_compose()}
 
     # sub relation
     for fname in ctx.detector.detect_compose():
         subcontext = ctx.make_subcontext(fname)
-        subdetail = _get_exposed_detail(subcontext)
+        subdetail = _get_exposed_detail(subcontext, prefixing_targets)
         for subpath, subpair in subdetail.items():
             if subpath in ignore_path_set:
                 detail[subpath].update(subpair)
@@ -100,23 +87,23 @@ def _get_exposed_detail(ctx):
     return detail
 
 
-def get_exposed_predicate(ctx):
-    predicate = {"responses": set(), "definitions": set()}
-    detail = _get_exposed_detail(ctx)
+def get_exposed_predicate(ctx, prefixing_targets):
+    predicate = {target_name: set() for target_name in prefixing_targets}
+    detail = _get_exposed_detail(ctx, prefixing_targets)
     detail.pop(ctx.identifier)
     for pair in detail.values():
-        predicate["responses"].update(pair["responses"])
-        predicate["definitions"].update(pair["definitions"])
+        for target_name in prefixing_targets:
+            predicate[target_name].update(pair[target_name])
     return predicate
 
 
 def transform(ctx, data, namespace=None):
     if namespace is None:
         return data
-
-    exposed_predicate = get_exposed_predicate(ctx)
+    prefixing_targets = set(["definitions", "responses"])
+    exposed_predicate = get_exposed_predicate(ctx, prefixing_targets)
     logger.debug("transform: identifier=%s, namespace=%s, ignore=%s", ctx.identifier, namespace, exposed_predicate)
-    prefixer = Prefixer(namespace, exposed_predicate)
+    prefixer = Prefixer(namespace, exposed_predicate, prefixing_targets)
     return prefixer.add_prefix(data)
 
 
