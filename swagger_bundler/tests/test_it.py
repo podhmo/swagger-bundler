@@ -18,7 +18,7 @@ class GenerationgTests(unittest.TestCase):
             ("compose", "x-bundler-compose"),
             ("concat", "x-bundler-concat"),
             ("namespace", "x-bundler-namespace"),
-            ("exposed", "x-bundler-exposed")
+            ("exposed", "x-bundler-exposed"),
         ]
         return make_rootcontext(OptionScanner(scan_items))
 

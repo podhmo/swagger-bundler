@@ -29,11 +29,14 @@ class Env:
 
 
 class OptionScanner:
-    def __init__(self, scan_items):
+    def __init__(self, scan_items, options=None):
         # usually {"compose": "x-bundler-compose", ...}
         # so in yaml file: x-bundler-compose: <compose sourcefile>
         # in program: "compose" as keyword.
         self.scan_items = scan_items
+
+        # TODO:: support options
+        self.options = options or {"prefixing_targets": set(["definitions", "responses", "parameters"])}
 
     def scan(self, data):
         return {sysname: data.pop(getname)
@@ -141,6 +144,10 @@ class Context:
     @property
     def path(self):
         return self.resolver.path
+
+    @property
+    def options(self):
+        return self.env.option_scanner.options
 
     @property
     def identifier(self):
