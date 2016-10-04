@@ -43,6 +43,9 @@ namespace = x-bundler-namespace
 compose = x-bundler-compose
 concat = x-bundler-concat
 exposed = x-bundler-exposed
+[postscript]
+concat = 
+bundle = 
 """
     sys.stderr.write("generate {}.\n".format(path))
     sys.stderr.flush()

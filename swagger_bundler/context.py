@@ -4,6 +4,8 @@ import os.path
 import sys
 import click
 import logging
+import magicalimport
+import importlib
 from . import loading
 from . import bundling
 logger = logging.getLogger(__name__)
@@ -29,23 +31,45 @@ class Env:
 
 
 class OptionScanner:
-    def __init__(self, scan_items, options=None):
+    def __init__(self, scan_items):
         # usually {"compose": "x-bundler-compose", ...}
         # so in yaml file: x-bundler-compose: <compose sourcefile>
         # in program: "compose" as keyword.
         self.scan_items = scan_items
 
         # TODO:: support options
-        self.options = options or {"prefixing_targets": set(["definitions", "responses", "parameters"])}
+        self.options = {
+            "prefixing_targets": set(["definitions", "responses", "parameters"]),
+            "postscripts": {}
+        }
 
     def scan(self, data):
         return {sysname: data.pop(getname)
                 for sysname, getname in self.scan_items
                 if getname in data}
 
+    def parse_postscript_section(self, items):
+        d = {}
+        for k, postscript in items:
+            if postscript and ":" in postscript:
+                module_path, fn_name = postscript.rsplit(":", 2)
+                try:
+                    _, ext = os.path.splitext(module_path)
+                    if ext == ".py":
+                        module = magicalimport.import_from_physical_path(module_path)
+                    else:
+                        module = importlib.import_module(module_path)
+                    d[k] = getattr(module, fn_name)
+                except (ImportError, AttributeError) as e:
+                    sys.stderr.write("could not import {!r}\n{}\n".format(postscript, e))
+        return d
+
     @classmethod
     def from_configparser(cls, parser):
-        return cls(tuple(parser.items("special_marker")))
+        scanner = cls(tuple(parser.items("special_marker")))
+        if parser.has_section("postscript"):
+            scanner.options["postscripts"] = scanner.parse_postscript_section(parser.items("postscript"))
+        return scanner
 
     @classmethod
     def from_dict(cls, d):
