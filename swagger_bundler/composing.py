@@ -51,7 +51,15 @@ def transform(ctx, fulldata, files):
         subfiles = subcontext.detector.detect_compose()
         if subfiles:
             additional = transform(subcontext, additional, subfiles)
-    return merged(additional, fulldata)
+    result = merged(additional, fulldata)
+
+    # TODO: handling code
+    postscript = ctx.options["postscript_hook"].get("compose")
+    if postscript and callable(postscript):
+        postscript_result = postscript(ctx, result)
+        if postscript_result is not None:
+            result = postscript_result
+    return result
 
 
 def run(ctx, files, outp):

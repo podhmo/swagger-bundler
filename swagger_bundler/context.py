@@ -40,7 +40,7 @@ class OptionScanner:
         # TODO:: support options
         self.options = {
             "prefixing_targets": set(["definitions", "responses", "parameters"]),
-            "postscripts": {}
+            "postscript_hook": {}
         }
 
     def scan(self, data):
@@ -48,15 +48,16 @@ class OptionScanner:
                 for sysname, getname in self.scan_items
                 if getname in data}
 
-    def parse_postscript_section(self, items):
+    def parse_postscript_section(self, items, here=None):
         d = {}
         for k, postscript in items:
+            postscript = postscript.strip()
             if postscript and ":" in postscript:
                 module_path, fn_name = postscript.rsplit(":", 2)
                 try:
                     _, ext = os.path.splitext(module_path)
                     if ext == ".py":
-                        module = magicalimport.import_from_physical_path(module_path)
+                        module = magicalimport.import_from_physical_path(module_path, here=here)
                     else:
                         module = importlib.import_module(module_path)
                     d[k] = getattr(module, fn_name)
@@ -67,8 +68,10 @@ class OptionScanner:
     @classmethod
     def from_configparser(cls, parser):
         scanner = cls(tuple(parser.items("special_marker")))
-        if parser.has_section("postscript"):
-            scanner.options["postscripts"] = scanner.parse_postscript_section(parser.items("postscript"))
+        if parser.has_section("postscript_hook"):
+            here = parser["config"]["config_dir"]
+            hooks = scanner.parse_postscript_section(parser.items("postscript_hook"), here=here)
+            scanner.options["postscript_hook"] = hooks
         return scanner
 
     @classmethod

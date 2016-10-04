@@ -16,6 +16,13 @@ def transform(ctx, data, namespace=None):
     namespace = namespace or ctx.detector.detect_namespace()
     if namespace:
         data = prefixing.transform(ctx, data, namespace=namespace)
+
+    # TODO: handling code
+    postscript = ctx.options["postscript_hook"].get("bundle")
+    if postscript and callable(postscript):
+        postscript_result = postscript(ctx, data, namespace=namespace)
+        if postscript_result is not None:
+            data = postscript_result
     return data
 
 
