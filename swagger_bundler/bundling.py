@@ -4,7 +4,7 @@ from . import loading
 from .ordering import ordering
 from . import composing
 from . import prefixing
-
+from . import orphancheck
 logger = logging.getLogger(__name__)
 
 
@@ -29,5 +29,8 @@ def transform(ctx, data, namespace=None, last=False):
 def run(ctx, inp, outp, namespace=None):
     subcontext = ctx.make_subcontext_from_port(inp)
     result = transform(subcontext, subcontext.data, namespace=namespace, last=True)
+
+    orphancheck.check_orphan_reference(ctx, result, exception_on_fail=False)
+
     ordered = ordering(result)
     loading.dump(ordered, outp)

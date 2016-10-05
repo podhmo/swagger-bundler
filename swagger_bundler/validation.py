@@ -6,10 +6,10 @@ import json
 import os.path
 from io import StringIO
 
-
 from jsonschema import validate
 from jsonschema import FormatChecker, ValidationError
 from . import loading
+from . import orphancheck
 
 
 def generate_validation_error_report(e, json_object, lines_before=7, lines_after=7):
@@ -122,3 +122,5 @@ def run(ctx, inp, out):
     postscript = ctx.options["postscript_hook"].get("validate")
     if postscript and callable(postscript):
         postscript(ctx, data, last=True)
+
+    orphancheck.check_orphan_reference(ctx, data, exception_on_fail=True)

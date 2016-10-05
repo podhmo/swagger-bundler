@@ -2,7 +2,6 @@
 import re
 import os.path
 import sys
-import click
 import logging
 import magicalimport
 import importlib
@@ -184,8 +183,7 @@ class Context:
         if e is not None:
             sys.stderr.write("{}: {}\n".format(type(e), e))
         msg = "  on where={!r}, open={!r}\n".format(self.path, src)
-        sys.stderr.write(click.style(msg, bold=True, fg="yellow"))
-        logger.info(msg)
+        highlight.show_on_warning(msg)
         sys.stderr.flush()
 
     def make_subcontext(self, src, data=None):
