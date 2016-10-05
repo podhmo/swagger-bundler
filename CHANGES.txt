@@ -1,3 +1,7 @@
+0.1.2
+
+- adding orphan reference check
+
 0.1.1
 
 - more hooks (add_namespace, validate)
