@@ -7,6 +7,7 @@ import magicalimport
 import importlib
 from . import loading
 from . import bundling
+from . import highlight
 logger = logging.getLogger(__name__)
 
 
