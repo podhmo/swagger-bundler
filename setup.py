@@ -40,7 +40,7 @@ watch_extras = [
 ]
 
 setup(name='swagger-bundler',
-      version='0.1.3',
+      version='0.1.4',
       description='swagger schema bundler',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[

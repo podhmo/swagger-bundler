@@ -109,7 +109,7 @@ def transform(ctx, data, namespace=None, last=False):
     # TODO: handling code
     postscript = ctx.options["postscript_hook"].get("add_namespace")
     if postscript and callable(postscript):
-        postscript_result = postscript(ctx, result, last=last)
+        postscript_result = postscript(ctx, result, last=last, exposed_predicate=exposed_predicate)
         if postscript_result is not None:
             result = postscript_result
     return result
