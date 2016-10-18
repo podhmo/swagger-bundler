@@ -1,0 +1,23 @@
+x-bundler-namespace:
+x-bundler-compose:
+  - ./api/emails.yaml
+  # - ./api/accountnames.yaml
+  # - ./api/users.yaml
+
+swagger: '2.0'
+info:
+  title: go-api-sokushukai example
+  description: https://github.com/shimastripe/go-api-sokushukai
+  version: "1.0.0"
+
+host: localhost
+
+schemes:
+  - https
+
+basePath: /api
+produces:
+  - application/json
+consumes:
+  - application/json
+

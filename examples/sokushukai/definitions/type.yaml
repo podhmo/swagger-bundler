@@ -1,0 +1,5 @@
+definitions:
+  DateTime:
+    type: string
+    example: 2000-01-01T01:01:01z
+

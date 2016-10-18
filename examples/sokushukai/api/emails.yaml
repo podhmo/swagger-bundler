@@ -1,0 +1,103 @@
+x-bundler-concat:
+  - ../definitions/type.yaml
+  - ../responses/error.yaml
+
+definitions:
+  Email:
+    type: object
+    description: Email
+    properties:
+      id:
+        type: number
+      user_id:
+        type: number
+      email:
+        $ref: '#/definitions/EmailAddress'
+      created_at:
+        $ref: '#/definitions/DateTime'
+      updated_at:
+        $ref: '#/definitions/DateTime'
+  EmailAddress:
+    type: string
+    description: Email Address
+
+paths:
+  /emails:
+    post:
+      description: Create a new email
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              user_id:
+                type: number
+              email:
+                $ref: '#/definitions/EmailAddress'
+      responses:
+        201:
+          description: created
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Email'
+        default:
+          $ref: '#/responses/ErrorResponse'
+    get:
+      description: Returns email list
+      responses:
+        200:
+          description: email list
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Email'
+        default:
+          $ref: '#/responses/ErrorResponse'
+  /emails/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: user id
+        type: number
+    get:
+      description: Returns email
+      responses:
+        200:
+          description: "return email"
+          schema:
+            $ref: '#/definitions/Email'
+        default:
+          $ref: '#/responses/ErrorResponse'
+    put:
+      description: Update email
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              user_id:
+                type: number
+              email:
+                $ref: '#/definitions/EmailAddress'
+      responses:
+        200:
+          description: "updated emails list"
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Email'
+        default:
+          $ref: '#/responses/ErrorResponse'
+    delete:
+      description: Deletes Email
+      responses:
+        204:
+          description: delete email
+        default:
+          $ref: '#/responses/ErrorResponse'
