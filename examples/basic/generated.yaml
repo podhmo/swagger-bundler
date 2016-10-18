@@ -1,10 +1,17 @@
+swagger: '2.0'
+info:
+  title: example
+  description: swagger-bundler examples
+  version: 1.0.0
+host: localhost
+schemes:
+- http
+basePath: /api/v1
+consumes:
+- application/json
+produces:
+- application/json
 definitions:
-  Error:
-    type: object
-    properties:
-      code:
-        type: integer
-        format: int32
   ZZZProductList:
     type: array
     items:
@@ -39,6 +46,12 @@ definitions:
         items:
           $ref: '#/definitions/ZZZProduct'
         description: Display name of series.
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
 responses:
   UnexpectedError:
     description: Unexpected error

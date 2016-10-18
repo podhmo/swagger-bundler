@@ -1,0 +1,18 @@
+x-bundler-concat:
+  - ./parts/error.yaml
+x-bundler-compose:
+  - ./parts/product.yaml
+
+paths:
+  /products:
+    get:
+      summary: Product Types
+      description: <description>
+      responses:
+        200:
+          description: An array of products
+          schema:
+            $ref: '#/definitions/ProductList'
+        default:
+          $ref: '#/responses/UnexpectedError'
+

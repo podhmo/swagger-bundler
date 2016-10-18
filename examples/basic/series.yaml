@@ -1,0 +1,17 @@
+x-bundler-concat:
+  - ./parts/error.yaml
+x-bundler-compose:
+  - ./parts/series.yaml
+
+paths:
+  /seriess:
+    get:
+      summary: Series Types
+      description: <description>
+      responses:
+        200:
+          description: An array of seriess
+          schema:
+            $ref: '#/definitions/SeriesList'
+        default:
+          $ref: '#/responses/UnexpectedError'

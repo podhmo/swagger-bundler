@@ -1,3 +1,21 @@
 x-bundler-namespace: ZZZ
 x-bundler-compose:
-  - ./parts/y.yaml
+  - ./product.yaml
+  - ./series.yaml
+
+swagger: '2.0'
+info:
+  title: example
+  description: swagger-bundler examples
+  version: "1.0.0"
+
+host: localhost
+
+schemes:
+  - http
+
+basePath: /api/v1
+produces:
+  - application/json
+consumes:
+  - application/json
