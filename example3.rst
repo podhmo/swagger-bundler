@@ -130,7 +130,9 @@ nested/main.yaml
          grouplist:
            $ref: '#/definitions/BooItemsGrouplist'
      BooItemsGrouplist:
-       $ref: '#/definitions/BooItemsGrouplistItems'
+       type: array
+       items:
+         $ref: '#/definitions/BooItemsGrouplistItems'
      BooItemsGrouplistItems:
        type: object
        properties:

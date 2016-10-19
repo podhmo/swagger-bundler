@@ -81,7 +81,10 @@ class ExtractorContext:
         self.r[name] = newdef
 
     def save_array(self, name, definition):
-        self.r[name] = definition
+        newdef = self.r.__class__()
+        newdef["type"] = "array"
+        newdef["items"] = definition
+        self.r[name] = newdef
 
 
 class SubDefinitionExtractor:
