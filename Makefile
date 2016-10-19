@@ -78,5 +78,31 @@ example3:
 	cat .tmp/02* | gsed 's/^/   /g' >> example3.rst
 	rm -r .tmp
 
-.PHONY: example example3
+example4:
+	rm -rf .tmp; mkdir -p .tmp
+	tree examples/mixin > .tmp/00structure.txt
+	for i in `find examples/mixin/ -name "*.yaml" -type f`; do cat $$i > .tmp/01`echo $$i | tr '/' '__'`;  done
+	for i in `find examples/mixin/ -name "*.py" -type f`; do cat $$i > .tmp/02`echo $$i | tr '/' '__'`;  done
+	(cd examples/mixin; swagger-bundler bundle main.yaml) > .tmp/03generated.yaml
+	rm -f example4.rst; touch example4.rst
+	echo "# structure" >> example4.rst
+	echo "\n.. code-block:: bash" >> example4.rst
+	echo "" >> example4.rst
+	echo "$ tree" | gsed 's/^/   /g' >> example4.rst
+	cat .tmp/00* | gsed 's/^/   /g' >> example4.rst
+	echo "$ swagger-bundler bundle main.yaml > generated.yaml" | gsed 's/^/   /g' >> example4.rst
+	echo "\n## swagger-bundler.ini(config file)" >> example4.rst
+	echo "\n.. code-block::" >> example4.rst
+	echo "" >> example4.rst
+	cat examples/mixin/swagger-bundler.ini | gsed 's/^/   /g' >> example4.rst
+	for i in `ls .tmp/02* | grep -v generated.py`; do echo "\n" >> example4.rst; echo `echo $${i} | gsed 's@^.tmp/02examples_@@g; s@__*@/@g;'` >> example4.rst; echo "\n.. code-block:: python\n" >> example4.rst; cat $${i} | gsed 's/^/   /g' >> example4.rst; done
+	echo "\n" >> example4.rst
+	for i in `ls .tmp/01* | grep -v generated.yaml`; do echo "\n" >> example4.rst; echo `echo $${i} | gsed 's@^.tmp/01examples_@@g; s@__*@/@g;'` >> example4.rst; echo "\n.. code-block:: yaml\n" >> example4.rst; cat $${i} | gsed 's/^/   /g' >> example4.rst; done
+	echo "\n" >> example4.rst
+	echo "## generated.yaml" >> example4.rst
+	echo "\n.. code-block:: yaml\n" >> example4.rst
+	cat .tmp/03* | gsed 's/^/   /g' >> example4.rst
+	rm -r .tmp
+
+.PHONY: example example4
 .PHONY: watch updatespec test regenerate

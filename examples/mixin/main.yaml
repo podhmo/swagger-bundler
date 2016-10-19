@@ -1,0 +1,47 @@
+x-bundler-types:
+  id:
+    pattern: '[0-9a-f]{24}'
+  s:
+    type: string
+
+
+definitions:
+  pair:
+    type: object
+    properties:
+      left:
+        type: string
+        x-bundler-mixin: '#/x-bundler-types/id'
+      right:
+        type: string
+        x-bundler-mixin: '#/x-bundler-types/id'
+  id:
+    x-bundler-mixin: ['#/x-bundler-types/id', '#/x-bundler-types/s']
+    description: object id
+
+parameters:
+  siteId:
+    x-bundler-mixin: ['#/x-bundler-types/id', '#/x-bundler-types/s']
+
+
+paths:
+  /sites/{siteId}:
+    PATCH:
+      operationId: updateSite
+      parameters:
+      - name: siteId
+        in: path
+        required: true
+        x-bundler-mixin: ['#/x-bundler-types/id', '#/x-bundler-types/s']
+      - name: body
+        in: body
+        schema:
+          type: object
+          properties:
+            url:
+              $ref: "#/definitions/id"
+            userId:
+              $ref: "#/definitions/id"
+      responses:
+        200:
+          description: OK

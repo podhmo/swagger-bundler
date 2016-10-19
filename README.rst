@@ -154,7 +154,10 @@ appendix:
 hook configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-the link of `example(hook configuration, lifting sub definitions) <example3.rst>`_
+Hook configuration examples.
+
+-  `lifting sub definitions sample <example3.rst>`_
+-  `tiny individual mixin sample <example4.rst>`_
 
 watch option
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
