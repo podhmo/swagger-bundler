@@ -98,13 +98,15 @@ def get_exposed_predicate(ctx, prefixing_targets):
 
 
 def transform(ctx, data, namespace=None, last=False):
-    if namespace is None:
-        return data
     prefixing_targets = ctx.options["prefixing_targets"]
     exposed_predicate = get_exposed_predicate(ctx, prefixing_targets)
-    logger.debug("transform: identifier=%s, namespace=%s, ignore=%s", ctx.identifier, namespace, exposed_predicate)
-    prefixer = Prefixer(namespace, exposed_predicate, prefixing_targets)
-    result = prefixer.add_prefix(data)
+
+    if namespace is None:
+        result = data
+    else:
+        logger.debug("transform: identifier=%s, namespace=%s, ignore=%s", ctx.identifier, namespace, exposed_predicate)
+        prefixer = Prefixer(namespace, exposed_predicate, prefixing_targets)
+        result = prefixer.add_prefix(data)
 
     # TODO: handling code
     postscript = ctx.options["postscript_hook"].get("add_namespace")
