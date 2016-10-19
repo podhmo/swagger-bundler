@@ -67,8 +67,8 @@ class ExtractorContext:
     def add_name(self, name):
         self.path.append(name.title())
 
-    def add_array_items(self):
-        self.add_name("items")
+    def add_array_item(self):
+        self.add_name("item")
 
     def pop_name(self):
         self.path.pop()
@@ -139,7 +139,7 @@ class SubDefinitionExtractor:
         if "$ref" in data["items"]:
             return data
         fullname = ctx.full_name()
-        ctx.add_array_items()
+        ctx.add_array_item()
         data["items"] = self._extract(data["items"], ctx)
         ctx.save_array(fullname, data["items"])
         ctx.pop_name()

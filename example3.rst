@@ -123,29 +123,29 @@ nested/main.yaml
      Boo:
        type: array
        items:
-         $ref: '#/definitions/BooItems'
-     BooItems:
+         $ref: '#/definitions/BooItem'
+     BooItem:
        type: object
        properties:
          foo:
            $ref: '#/definitions/Foo'
          user:
-           $ref: '#/definitions/BooItemsUser'
+           $ref: '#/definitions/BooItemUser'
          grouplist:
-           $ref: '#/definitions/BooItemsGrouplist'
+           $ref: '#/definitions/BooItemGrouplist'
        x-auto-generated: true
-     BooItemsGrouplist:
+     BooItemGrouplist:
        type: array
        items:
-         $ref: '#/definitions/BooItemsGrouplistItems'
+         $ref: '#/definitions/BooItemGrouplistItem'
        x-auto-generated: true
-     BooItemsGrouplistItems:
+     BooItemGrouplistItem:
        type: object
        properties:
          name:
            type: string
        x-auto-generated: true
-     BooItemsUser:
+     BooItemUser:
        type: object
        properties:
          name:
