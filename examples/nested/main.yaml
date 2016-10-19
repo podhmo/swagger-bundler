@@ -27,13 +27,13 @@ definitions:
       properties:
         foo:
           $ref: "#/definitions/Foo"
-        Person:
+        user:
           properties:
             name:
               type: string
             age:
               type: number
-        GroupList:
+        grouplist:
           type: array
           items:
             properties:

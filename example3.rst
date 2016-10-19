@@ -68,13 +68,13 @@ nested/main.yaml
          properties:
            foo:
              $ref: "#/definitions/Foo"
-           Person:
+           user:
              properties:
                name:
                  type: string
                age:
                  type: number
-           GroupList:
+           grouplist:
              type: array
              items:
                properties:
@@ -125,9 +125,9 @@ nested/main.yaml
        properties:
          foo:
            $ref: '#/definitions/Foo'
-         Person:
-           $ref: '#/definitions/BooItemsPerson'
-         GroupList:
+         user:
+           $ref: '#/definitions/BooItemsUser'
+         grouplist:
            $ref: '#/definitions/BooItemsGrouplist'
      BooItemsGrouplist:
        $ref: '#/definitions/BooItemsGrouplistItems'
@@ -136,7 +136,7 @@ nested/main.yaml
        properties:
          name:
            type: string
-     BooItemsPerson:
+     BooItemsUser:
        type: object
        properties:
          name:
