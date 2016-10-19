@@ -31,10 +31,9 @@ def lifting_definition(ctx, data, *args, **kwargs):
     w = SubDefinitionExtractor(replace=True)
     for name in list(data["definitions"].keys()):
         prop = data["definitions"].pop(name)
-        extracted = w.extract(prop, [name])
+        extracted = w.extract(prop, MarkedExtractorContext([name]))
         extracted[name] = prop
         data["definitions"].update(reversed(extracted.items()))
-
 
 
 def fix_data_in_target_section(paths, d, fn):
@@ -79,20 +78,31 @@ class ExtractorContext:
         newdef["type"] = "object"
         newdef["properties"] = definition
         self.r[name] = newdef
+        return newdef
 
     def save_array(self, name, definition):
         newdef = self.r.__class__()
         newdef["type"] = "array"
         newdef["items"] = definition
         self.r[name] = newdef
+        return newdef
+
+
+class MarkedExtractorContext(ExtractorContext):
+    def save_object(self, name, definition):
+        newdef = super().save_object(name, definition)
+        newdef["x-auto-generated"] = True
+
+    def save_array(self, name, definition):
+        newdef = super().save_array(name, definition)
+        newdef["x-auto-generated"] = True
 
 
 class SubDefinitionExtractor:
     def __init__(self, replace=True):
         self.replace = replace
 
-    def extract(self, data, path, r=None):
-        ctx = ExtractorContext(path, r)
+    def extract(self, data, ctx):
         self._extract(data, ctx)
         for k in list(ctx.r.keys()):
             ctx.r[k] = copy.deepcopy(ctx.r[k])

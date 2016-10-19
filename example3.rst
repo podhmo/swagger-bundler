@@ -99,6 +99,7 @@ nested/main.yaml
        properties:
          boo:
            $ref: '#/definitions/FooBarBoo'
+       x-auto-generated: true
      FooBarBoo:
        type: object
        properties:
@@ -106,16 +107,19 @@ nested/main.yaml
            $ref: '#/definitions/FooBarBooYoo'
          x:
            $ref: '#/definitions/X'
+       x-auto-generated: true
      FooBarBooYoo:
        type: object
        properties:
          yah:
            $ref: '#/definitions/FooBarBooYooYah'
+       x-auto-generated: true
      FooBarBooYooYah:
        type: object
        properties:
          yay:
            type: string
+       x-auto-generated: true
      Boo:
        type: array
        items:
@@ -129,15 +133,18 @@ nested/main.yaml
            $ref: '#/definitions/BooItemsUser'
          grouplist:
            $ref: '#/definitions/BooItemsGrouplist'
+       x-auto-generated: true
      BooItemsGrouplist:
        type: array
        items:
          $ref: '#/definitions/BooItemsGrouplistItems'
+       x-auto-generated: true
      BooItemsGrouplistItems:
        type: object
        properties:
          name:
            type: string
+       x-auto-generated: true
      BooItemsUser:
        type: object
        properties:
@@ -145,3 +152,4 @@ nested/main.yaml
            type: string
          age:
            type: number
+       x-auto-generated: true
