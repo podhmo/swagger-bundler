@@ -1,3 +1,7 @@
+0.1.5
+
+- adding postscript.lifting_definition(hook)
+
 0.1.4
 
 - adding extra information, exposed_predicate, on prefixing(add_namespace) postscript hook
