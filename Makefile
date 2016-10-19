@@ -55,5 +55,28 @@ example2:
 	cat .tmp/02* | gsed 's/^/   /g' >> example2.rst
 	rm -r .tmp
 
-.PHONY: example example2
+example3:
+	rm -rf .tmp; mkdir -p .tmp
+	tree examples/nested > .tmp/00structure.txt
+	for i in `find examples/nested/ -name "*.yaml" -type f`; do cat $$i > .tmp/01`echo $$i | tr '/' '__'`;  done
+	(cd examples/nested; swagger-bundler bundle main.yaml) > .tmp/02generated.yaml
+	rm -f example3.rst; touch example3.rst
+	echo "# structure" >> example3.rst
+	echo "\n.. code-block:: bash" >> example3.rst
+	echo "" >> example3.rst
+	echo "$ tree" | gsed 's/^/   /g' >> example3.rst
+	cat .tmp/00* | gsed 's/^/   /g' >> example3.rst
+	echo "$ swagger-bundler bundle main.yaml > generated.yaml" | gsed 's/^/   /g' >> example3.rst
+	echo "\n## swagger-bundler.ini(config file)" >> example3.rst
+	echo "\n.. code-block::" >> example3.rst
+	echo "" >> example3.rst
+	cat examples/nested/swagger-bundler.ini | gsed 's/^/   /g' >> example3.rst
+	for i in `ls .tmp/01* | grep -v generated.yaml`; do echo "\n" >> example3.rst; echo `echo $${i} | gsed 's@^.tmp/01examples_@@g; s@__*@/@g;'` >> example3.rst; echo "\n.. code-block:: yaml\n" >> example3.rst; cat $${i} | gsed 's/^/   /g' >> example3.rst; done
+	echo "\n" >> example3.rst
+	echo "## generated.yaml" >> example3.rst
+	echo "\n.. code-block:: yaml\n" >> example3.rst
+	cat .tmp/02* | gsed 's/^/   /g' >> example3.rst
+	rm -r .tmp
+
+.PHONY: example example3
 .PHONY: watch updatespec test regenerate

@@ -148,7 +148,13 @@ This is just concatnate files.
 appendix:
 ----------------------------------------
 
+- `hook` configuration.
 - `watch` option is supported.
+
+hook configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+the link of `example(hook configuration, lifting sub definitions) <example3.rst>`_
 
 watch option
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

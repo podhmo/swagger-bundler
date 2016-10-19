@@ -1,0 +1,41 @@
+definitions:
+  X:
+    type: string
+  Foo:
+    type: object
+    properties:
+      bar:
+        type: object
+        properties:
+          boo:
+            type: object
+            properties:
+              yoo:
+                type: object
+                properties:
+                  yah:
+                    type: object
+                    properties:
+                      yay:
+                        type: string
+              x:
+                $ref: '#/definitions/X'
+  Boo:
+    type: array
+    items:
+      type: object
+      properties:
+        foo:
+          $ref: "#/definitions/Foo"
+        Person:
+          properties:
+            name:
+              type: string
+            age:
+              type: number
+        GroupList:
+          type: array
+          items:
+            properties:
+              name:
+                type: string
