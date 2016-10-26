@@ -1,3 +1,8 @@
+0.1.7
+
+- reviving context cache
+- fix ValueError when merging with None
+
 0.1.6
 
 - fix bug (lifting definition on array)
