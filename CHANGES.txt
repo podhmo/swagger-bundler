@@ -1,3 +1,7 @@
+0.1.8
+
+- fix qualified import bug(since 0.1.7)
+
 0.1.7
 
 - reviving context cache
