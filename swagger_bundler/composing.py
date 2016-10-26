@@ -25,6 +25,8 @@ def _merged(left, right):
                 else:
                     r[k] = right[k]
             return r
+        elif right is None:
+            return left
         else:
             raise ValueError("cannot merge dict and non-dict: left=%s, right=%s", left, right)
     else:
