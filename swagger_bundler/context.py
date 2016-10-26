@@ -144,6 +144,8 @@ class PathResolver:
         m = self.IDENTIFIER_RX.search(src)
         if m is not None:
             return self.resolve_path(m.group(1)), m.group(2)
+        elif self.ns is not None:
+            return self.resolve_path(src), self.ns
         else:
             return self.resolve_path(src), None
 
@@ -214,7 +216,7 @@ class Context:
 
         # on qualified import
         ns = subcontext.resolver.ns
-        if ns is not None:
+        if ns is not None and self.resolver.ns != ns:
             subcontext.data = bundling.transform(subcontext, subcontext.data, namespace=ns)
             # update compose targets list.
             exposed_list = subcontext.detector.detect_exposed()

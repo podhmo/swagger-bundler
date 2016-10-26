@@ -47,6 +47,7 @@ def transform(ctx, fulldata, files, last=False):
     for src in files:
         subcontext = ctx.make_subcontext(src)
         if subcontext.is_marked():
+            logger.debug("skip: {}\n".format(subcontext.identifier))
             continue
         additional = merged(additional, subcontext.data)
         subcontext.mark()
