@@ -27,7 +27,7 @@ class Env:
         return self.pool.get(path) or default
 
     def register_context(self, context):
-        self.pool[context.path] = context
+        self.pool[context.identifier] = context
 
 
 class OptionScanner:
