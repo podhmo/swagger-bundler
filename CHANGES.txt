@@ -1,3 +1,7 @@
+0.1.9
+
+- fix titlize function is invalid that using lifting definition hook. (fooBar -> Foobar)
+
 0.1.8
 
 - fix qualified import bug(since 0.1.7)
