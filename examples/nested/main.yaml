@@ -7,7 +7,7 @@ definitions:
       bar:
         type: object
         properties:
-          boo:
+          booAbcXyz:
             type: object
             properties:
               yoo:
@@ -20,6 +20,7 @@ definitions:
                         type: string
               x:
                 $ref: '#/definitions/X'
+
   Boo:
     type: array
     items:

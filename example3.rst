@@ -48,7 +48,7 @@ nested/main.yaml
          bar:
            type: object
            properties:
-             boo:
+             booAbcXyz:
                type: object
                properties:
                  yoo:
@@ -61,6 +61,7 @@ nested/main.yaml
                            type: string
                  x:
                    $ref: '#/definitions/X'
+   
      Boo:
        type: array
        items:
@@ -97,24 +98,24 @@ nested/main.yaml
      FooBar:
        type: object
        properties:
-         boo:
-           $ref: '#/definitions/FooBarBoo'
+         booAbcXyz:
+           $ref: '#/definitions/FooBarBooabcxyz'
        x-auto-generated: true
-     FooBarBoo:
+     FooBarBooabcxyz:
        type: object
        properties:
          yoo:
-           $ref: '#/definitions/FooBarBooYoo'
+           $ref: '#/definitions/FooBarBooabcxyzYoo'
          x:
            $ref: '#/definitions/X'
        x-auto-generated: true
-     FooBarBooYoo:
+     FooBarBooabcxyzYoo:
        type: object
        properties:
          yah:
-           $ref: '#/definitions/FooBarBooYooYah'
+           $ref: '#/definitions/FooBarBooabcxyzYooYah'
        x-auto-generated: true
-     FooBarBooYooYah:
+     FooBarBooabcxyzYooYah:
        type: object
        properties:
          yay:
