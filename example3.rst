@@ -99,23 +99,23 @@ nested/main.yaml
        type: object
        properties:
          booAbcXyz:
-           $ref: '#/definitions/FooBarBooabcxyz'
+           $ref: '#/definitions/FooBarBooAbcXyz'
        x-auto-generated: true
-     FooBarBooabcxyz:
+     FooBarBooAbcXyz:
        type: object
        properties:
          yoo:
-           $ref: '#/definitions/FooBarBooabcxyzYoo'
+           $ref: '#/definitions/FooBarBooAbcXyzYoo'
          x:
            $ref: '#/definitions/X'
        x-auto-generated: true
-     FooBarBooabcxyzYoo:
+     FooBarBooAbcXyzYoo:
        type: object
        properties:
          yah:
-           $ref: '#/definitions/FooBarBooabcxyzYooYah'
+           $ref: '#/definitions/FooBarBooAbcXyzYooYah'
        x-auto-generated: true
-     FooBarBooabcxyzYooYah:
+     FooBarBooAbcXyzYooYah:
        type: object
        properties:
          yay:
