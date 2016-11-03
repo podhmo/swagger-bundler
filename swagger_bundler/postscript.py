@@ -4,6 +4,7 @@ import pprint
 import copy
 from collections import deque
 from collections import OrderedDict
+from .langhelpers import titleize
 
 
 def echo(ctx, data, *args, **kwargs):
@@ -88,7 +89,7 @@ class ExtractorContext:
         return "".join(self.path)
 
     def add_name(self, name):
-        self.path.append(name.title())
+        self.path.append(titleize(name))
 
     def add_array_item(self):
         self.add_name("item")

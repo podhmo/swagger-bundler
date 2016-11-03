@@ -179,22 +179,6 @@ basic/series.yaml
    produces:
    - application/json
    definitions:
-     ZZZProductList:
-       type: array
-       items:
-         $ref: '#/definitions/ZZZProduct'
-     ZZZProduct:
-       type: object
-       properties:
-         product_id:
-           type: string
-           description: Unique ID.
-         description:
-           type: string
-           description: Description of product.
-         display_name:
-           type: string
-           description: Display name of product.
      ZZZSeriesList:
        type: array
        items:
@@ -213,6 +197,22 @@ basic/series.yaml
            items:
              $ref: '#/definitions/ZZZProduct'
            description: Display name of series.
+     ZZZProductList:
+       type: array
+       items:
+         $ref: '#/definitions/ZZZProduct'
+     ZZZProduct:
+       type: object
+       properties:
+         product_id:
+           type: string
+           description: Unique ID.
+         description:
+           type: string
+           description: Description of product.
+         display_name:
+           type: string
+           description: Display name of product.
      Error:
        type: object
        properties:

@@ -3,13 +3,9 @@ import logging
 from collections import defaultdict
 from . import loading
 from .ordering import ordering, make_dict
-
+from .langhelpers import titleize
 
 logger = logging.getLogger(__name__)
-
-
-def _titleize(s):
-    return "{}{}".format(s[0].title(), s[1:])
 
 
 class Prefixer:
@@ -46,12 +42,12 @@ class Prefixer:
         for k in self.prefixing_targets:
             if "/{}".format(k) in head and tail in self.exposed_predicate[k]:
                 return v
-        return "/".join([head, "{}{}".format(self.namespace, _titleize(tail))])
+        return "/".join([head, "{}{}".format(self.namespace, titleize(tail))])
 
     def _transform_name(self, v):
         if self.namespace in v:
             return v
-        return "{}{}".format(self.namespace, _titleize(v))
+        return "{}{}".format(self.namespace, titleize(v))
 
     def _transform_with_prefixing(self, section_name, data):
         d = make_dict()
