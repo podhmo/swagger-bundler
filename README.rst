@@ -156,8 +156,9 @@ hook configuration
 
 Hook configuration examples.
 
--  `lifting sub definitions sample <example3.rst>`_
--  `tiny individual mixin sample <example4.rst>`_
+- `lifting sub definitions sample <example3.rst>`_
+- `tiny individual mixin sample <example4.rst>`_
+- `deref sample <example5.rst>`_
 
 watch option
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
