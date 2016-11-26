@@ -22,7 +22,7 @@ def echo(ctx, data, *args, **kwargs):
 _rx_cache = {}
 
 
-def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitions", "paths", "responses"]), **kwargs):
+def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitions", "responses", "parameters"]), **kwargs):
     cache_k = tuple(targets)
     if cache_k not in _rx_cache:
         _rx_cache[cache_k] = re.compile("#/({})/".format("|".join(targets)))
@@ -31,7 +31,7 @@ def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitio
     # plain ref :: #/<section>/<name>
     # extra ref :: <path>#/<section>/<name>
     # path :: (<name>/)*<name>
-    # section :: 'definitions' | 'paths' | 'responses'
+    # section :: 'definitions' | 'parameters' | 'responses'
 
     def deref(d, ctx, paths):
         if "$ref" not in d:
