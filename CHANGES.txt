@@ -1,3 +1,7 @@
+0.1.10.1
+
+- fix deref implemetation
+
 0.1.10
 
 - adding load hook
