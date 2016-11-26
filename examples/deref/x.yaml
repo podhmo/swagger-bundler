@@ -1,0 +1,3 @@
+definitions:
+  color:
+    $ref: color/cmyk.yaml#/definitions/color

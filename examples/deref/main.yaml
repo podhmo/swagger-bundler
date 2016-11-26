@@ -1,0 +1,8 @@
+x-bundler-compose:
+  - x.yaml as X
+
+definitions:
+  foo:
+    $ref: "./group/group.yaml#/definitions/group"
+  color:
+    $ref: "group/group.yaml#/definitions/color"

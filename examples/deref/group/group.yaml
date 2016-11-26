@@ -1,0 +1,9 @@
+definitions:
+  group:
+    type: string
+    enum:
+      - A
+      - B
+      - C
+  color:
+    $ref: "../color/rgb.yaml#/definitions/color"

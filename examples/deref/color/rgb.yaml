@@ -1,0 +1,7 @@
+definitions:
+  color:
+    type: string
+    enum:
+      - r
+      - g
+      - b
