@@ -1,3 +1,6 @@
+x-bundler-compose:
+  - group/group.yaml
+
 definitions:
   color:
-    $ref: color/cmyk.yaml#/definitions/color
+    $ref: "color/rgb.yaml#/definitions/color"

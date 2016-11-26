@@ -130,5 +130,7 @@ example5:
 	cat .tmp/03* | gsed 's/^/   /g' >> example5.rst
 	rm -r .tmp
 
-.PHONY: example
+examples: example example2 example3 example4 example5
+
+.PHONY: examples
 .PHONY: watch updatespec test regenerate

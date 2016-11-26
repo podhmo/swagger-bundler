@@ -81,8 +81,6 @@ deref/group/group.yaml
          - A
          - B
          - C
-     color:
-       $ref: "../color/rgb.yaml#/definitions/color"
 
 
 deref/main.yaml
@@ -93,19 +91,24 @@ deref/main.yaml
      - x.yaml as X
    
    definitions:
-     foo:
-       $ref: "./group/group.yaml#/definitions/group"
      color:
-       $ref: "group/group.yaml#/definitions/color"
+       $ref: "color/cmyk.yaml#/definitions/color"
+     rgb:
+       $ref: "color/rgb.yaml#/definitions/color"
+     cmyk:
+       $ref: "color/cmyk.yaml#/definitions/color"
 
 
 deref/x.yaml
 
 .. code-block:: yaml
 
+   x-bundler-compose:
+     - group/group.yaml
+   
    definitions:
      color:
-       $ref: color/cmyk.yaml#/definitions/color
+       $ref: "color/rgb.yaml#/definitions/color"
 
 
 ## generated.yaml
@@ -113,22 +116,31 @@ deref/x.yaml
 .. code-block:: yaml
 
    definitions:
+     XGroup:
+       type: string
+       enum:
+       - A
+       - B
+       - C
      XColor:
+       type: string
+       enum:
+       - r
+       - g
+       - b
+     color:
        type: string
        enum:
        - C
        - M
        - Y
        - K
-     foo:
-       type: string
-       enum:
-       - A
-       - B
-       - C
-     color:
+     rgb:
+       x-conflicted: color/rgb.yaml#/definitions/color
        type: string
        enum:
        - r
        - g
        - b
+     cmyk:
+       $ref: '#/definitions/color'

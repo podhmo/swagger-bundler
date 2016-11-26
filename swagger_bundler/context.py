@@ -182,6 +182,10 @@ class Context:
     def identifier(self):
         return self.resolver.identifier
 
+    @property
+    def ns(self):
+        return self.resolver.ns
+
     def _on_load_failure(self, src, e=None):
         if e is not None:
             sys.stderr.write("{}: {}\n".format(type(e), e))
@@ -229,7 +233,6 @@ class Context:
             exposed_list = subcontext.detector.detect_exposed()
             new_compose_target_list = [c for c in subcontext.detector.detect_compose() if c in exposed_list]
             subcontext.detector.update_compose(new_compose_target_list)
-
         return subcontext
 
     def make_subcontext_from_port(self, port):

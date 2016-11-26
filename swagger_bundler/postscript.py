@@ -5,7 +5,7 @@ import pprint
 import copy
 from collections import deque
 from collections import OrderedDict
-from .langhelpers import titleize
+from .langhelpers import titleize, guess_name
 from . import highlight
 
 
@@ -22,7 +22,7 @@ def echo(ctx, data, *args, **kwargs):
 _rx_cache = {}
 
 
-def deref_support_for_extra_file(ctx, data, *args, targets=tuple(["definitions", "paths", "responses"]), **kwargs):
+def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitions", "paths", "responses"]), **kwargs):
     cache_k = tuple(targets)
     if cache_k not in _rx_cache:
         _rx_cache[cache_k] = re.compile("#/({})/".format("|".join(targets)))
@@ -33,39 +33,65 @@ def deref_support_for_extra_file(ctx, data, *args, targets=tuple(["definitions",
     # path :: (<name>/)*<name>
     # section :: 'definitions' | 'paths' | 'responses'
 
-    def deref(d, ctx, i):
+    def deref(d, ctx, paths):
         if "$ref" not in d:
-            return d, i
+            return d, paths
         try:
             m = separator_rx.search(d["$ref"])
             if m is None:
                 highlight.show_on_warning("invalid ref: {}\n".format(d["$ref"]))
-                return d, i
+                return d, paths
 
             # plain ref
             if m.start() == 0:
-                return d, i
+                return d, paths
 
             # with extra path
             path = d["$ref"][:m.start()]
             section = m.group(1)
             name = d["$ref"][m.end():]
             subctx = ctx.make_subcontext(path)
-            return deref(subctx.data[section][name], ctx=subctx, i=i + 1)
+
+            # gueesing key (this is heuristic)
+            section_store = subctx.data[section]
+            for guessed in guess_name(name, subctx.ns):
+                if guessed in section_store:
+                    paths.append((section, name))
+                    return deref(section_store[guessed], ctx=subctx, paths=paths)
+            highlight.show_on_warning("not found ref: {}\n".format(d["$ref"]))
+            return d, paths
         except (IndexError, ValueError) as e:
             highlight.show_on_warning(str(e))
 
     def on_ref_found(d):
-        data, i = deref(d, ctx, 0)
-        if i > 0:
-            d.pop("$ref")
-            d.update(data)
+        data, paths = deref(d, ctx, [])
+        if paths:
+            original_ref = d.pop("$ref")
+            section, name = paths[-1]
+
+            d["$ref"] = "#/{}/{}".format(section, name)
+            if section not in rootdata:
+                rootdata[section] = OrderedDict()
+
+            if name not in rootdata[section]:
+                rootdata[section][name] = data
+            elif d == rootdata[section][name]:
+                d.pop("$ref")
+                d.update(data)
+            else:
+                refpath = "#/{}/{}".format(section, name)
+                if rootdata[section][name] != data:
+                    d["x-conflicted"] = original_ref
+                    msg = "{} is conflicted. (where file={!r} ref={!r})".format(refpath, ctx.path, original_ref)
+                    highlight.show_on_warning(msg)
+                    d.pop("$ref")
+                    d.update(data)
 
     w = LooseDictWalker(on_container=on_ref_found)
     q = ["$ref"]
     for section in targets:
-        if section in data:
-            w.walk(q, data[section])
+        if section in rootdata:
+            w.walk(q, rootdata[section])
 
 
 def add_responses_default(ctx, data, *args, **kwargs):
