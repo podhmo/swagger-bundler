@@ -51,6 +51,7 @@ exposed = x-bundler-exposed
 # swagger_bundler.postscript:echo
 # or
 # a/b/c/d.py:function_name
+load =
 compose =
 bundle =
 add_namespace =

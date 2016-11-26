@@ -214,6 +214,13 @@ class Context:
         subcontext = self.__class__(self.env, subdetector, subresolver, data)
         self.env.register_context(subcontext)
 
+        # TODO: handling code
+        postscript = subcontext.options["postscript_hook"].get("load")
+        if postscript and callable(postscript):
+            postscript_result = postscript(subcontext, subcontext.data, last=False)
+            if postscript_result is not None:
+                subcontext.data = postscript_result
+
         # on qualified import
         ns = subcontext.resolver.ns
         if ns is not None and self.resolver.ns != ns:
@@ -222,6 +229,7 @@ class Context:
             exposed_list = subcontext.detector.detect_exposed()
             new_compose_target_list = [c for c in subcontext.detector.detect_compose() if c in exposed_list]
             subcontext.detector.update_compose(new_compose_target_list)
+
         return subcontext
 
     def make_subcontext_from_port(self, port):

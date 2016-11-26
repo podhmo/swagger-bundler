@@ -1,3 +1,4 @@
+import re
 import traceback
 import sys
 import pprint
@@ -5,6 +6,7 @@ import copy
 from collections import deque
 from collections import OrderedDict
 from .langhelpers import titleize
+from . import highlight
 
 
 def echo(ctx, data, *args, **kwargs):
@@ -15,6 +17,55 @@ def echo(ctx, data, *args, **kwargs):
         pprint.pformat(kwargs, indent=2))
     )
     traceback.print_stack(limit=1, file=sys.stderr)
+
+
+_rx_cache = {}
+
+
+def deref_support_for_extra_file(ctx, data, *args, targets=tuple(["definitions", "paths", "responses"]), **kwargs):
+    cache_k = tuple(targets)
+    if cache_k not in _rx_cache:
+        _rx_cache[cache_k] = re.compile("#/({})/".format("|".join(targets)))
+    separator_rx = _rx_cache[cache_k]
+
+    # plain ref :: #/<section>/<name>
+    # extra ref :: <path>#/<section>/<name>
+    # path :: (<name>/)*<name>
+    # section :: 'definitions' | 'paths' | 'responses'
+
+    def deref(d, ctx, i):
+        if "$ref" not in d:
+            return d, i
+        try:
+            m = separator_rx.search(d["$ref"])
+            if m is None:
+                highlight.show_on_warning("invalid ref: {}\n".format(d["$ref"]))
+                return d, i
+
+            # plain ref
+            if m.start() == 0:
+                return d, i
+
+            # with extra path
+            path = d["$ref"][:m.start()]
+            section = m.group(1)
+            name = d["$ref"][m.end():]
+            subctx = ctx.make_subcontext(path)
+            return deref(subctx.data[section][name], ctx=subctx, i=i + 1)
+        except (IndexError, ValueError) as e:
+            highlight.show_on_warning(str(e))
+
+    def on_ref_found(d):
+        data, i = deref(d, ctx, 0)
+        if i > 0:
+            d.pop("$ref")
+            d.update(data)
+
+    w = LooseDictWalker(on_container=on_ref_found)
+    q = ["$ref"]
+    for section in targets:
+        if section in data:
+            w.walk(q, data[section])
 
 
 def add_responses_default(ctx, data, *args, **kwargs):
