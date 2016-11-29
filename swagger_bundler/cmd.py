@@ -6,7 +6,6 @@ import logging
 from swagger_bundler import make_rootcontext_from_configparser
 from swagger_bundler import config as configuration
 import swagger_bundler.modifiers.ordering as ordering
-import swagger_bundler.modifiers.bundling as bundling
 import swagger_bundler.modifiers.composing as composing
 import swagger_bundler.loading as loading
 
@@ -59,13 +58,12 @@ def bundle(file, namespace, input, output, watch, no_watch, outfile, log):
 
     def run():
         ctx = _prepare()
-        driver = ctx.options["driver"](ctx)
         with open(file) as rf:
             if outfile:
                 with open(outfile, "w") as wf:
-                    driver.run(rf, wf, namespace=namespace)
+                    ctx.driver.run(ctx, rf, wf, namespace=namespace)
             else:
-                driver.run(rf, sys.stdout, namespace=namespace)
+                ctx.driver.run(ctx, rf, sys.stdout, namespace=namespace)
     if not watch:
         run()
     else:

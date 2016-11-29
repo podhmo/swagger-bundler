@@ -4,7 +4,7 @@ import os.path
 here = os.path.abspath(os.path.dirname(__file__))
 
 
-class GenerationgTests(unittest.TestCase):
+class OrphanCheckTests(unittest.TestCase):
     def _callFUT(self, ctx, data):
         from swagger_bundler.modifiers import orphancheck
         ctx.options["prefixing_targets"] = ["definitions", "responses", "parameters"]
@@ -13,6 +13,7 @@ class GenerationgTests(unittest.TestCase):
     def _makeRootContext(self):
         from swagger_bundler.context import make_rootcontext
         from swagger_bundler.context import OptionScanner
+        from swagger_bundler.drivers import FileConcatDriver
         # [(sysname, getname),...]
         scan_items = [
             ("compose", "x-bundler-compose"),
@@ -20,7 +21,7 @@ class GenerationgTests(unittest.TestCase):
             ("namespace", "x-bundler-namespace"),
             ("exposed", "x-bundler-exposed"),
         ]
-        return make_rootcontext(OptionScanner(scan_items))
+        return make_rootcontext(OptionScanner(scan_items, driver_class=FileConcatDriver))
 
     def test_it(self):
         ctx = self._makeRootContext()

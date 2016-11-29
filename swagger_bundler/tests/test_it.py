@@ -6,13 +6,13 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 
 class GenerationgTests(unittest.TestCase):
-    def _callFUT(self, *args, **kwargs):
-        from swagger_bundler.modifiers import bundling
-        return bundling.transform(*args, **kwargs)
+    def _callFUT(self, subcontext, *args, **kwargs):
+        return subcontext.driver.transform(subcontext, *args, **kwargs)
 
     def _makeRootContext(self):
         from swagger_bundler.context import make_rootcontext
         from swagger_bundler.context import OptionScanner
+        from swagger_bundler.drivers import FileConcatDriver
         # [(sysname, getname),...]
         scan_items = [
             ("compose", "x-bundler-compose"),
@@ -20,7 +20,8 @@ class GenerationgTests(unittest.TestCase):
             ("namespace", "x-bundler-namespace"),
             ("exposed", "x-bundler-exposed"),
         ]
-        return make_rootcontext(OptionScanner(scan_items))
+        scanner = OptionScanner(scan_items, driver_class=FileConcatDriver)
+        return make_rootcontext(scanner)
 
     def test_it(self):
         ctx = self._makeRootContext()

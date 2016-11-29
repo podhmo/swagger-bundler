@@ -6,16 +6,21 @@ import logging
 import magicalimport
 import importlib
 from . import loading
-from .modifiers import bundling
 from . import highlight
 logger = logging.getLogger(__name__)
 
 
 class Env:
-    def __init__(self, option_scanner, pool=None, preprocessor=None):
+    def __init__(self, option_scanner, driver, pool=None, preprocessor=None):
         self.option_scanner = option_scanner
         self.preprocessor = preprocessor or DEFAULT_PREPROCESSOR
         self.pool = pool or {}  # Dict[path, context]
+
+        self.driver = driver
+        self.root_context = None
+
+    def register_driver(self, driver):
+        self.driver = driver
 
     def __contains__(self, path):
         return path in self.pool
@@ -31,7 +36,7 @@ class Env:
 
 
 class OptionScanner:
-    def __init__(self, scan_items):
+    def __init__(self, scan_items, driver_class=None):
         # usually {"compose": "x-bundler-compose", ...}
         # so in yaml file: x-bundler-compose: <compose sourcefile>
         # in program: "compose" as keyword.
@@ -41,7 +46,7 @@ class OptionScanner:
         self.options = {
             "prefixing_targets": set(["definitions", "responses", "parameters"]),
             "postscript_hook": {},
-            "driver": None,
+            "driver_class": driver_class,
         }
 
     def scan(self, data):
@@ -76,12 +81,8 @@ class OptionScanner:
             here = parser["config"]["config_dir"]
             hooks = scanner.load_functions(parser.items("postscript_hook"), here=here)
             scanner.options["postscript_hook"] = hooks
-            scanner.options["driver"] = scanner.load_function(parser["DEFAULT"]["driver"], here=here)
+        scanner.options["driver_class"] = scanner.load_function(parser["DEFAULT"]["driver"], here=here)
         return scanner
-
-    @classmethod
-    def from_dict(cls, d):
-        return cls(tuple(d.items()))
 
 
 class Preprocessor:
@@ -176,6 +177,10 @@ class Context:
         self.marked = True
 
     @property
+    def driver(self):
+        return self.env.driver
+
+    @property
     def path(self):
         return self.resolver.path
 
@@ -233,7 +238,7 @@ class Context:
         # on qualified import
         ns = subcontext.resolver.ns
         if ns is not None and self.resolver.ns != ns:
-            subcontext.data = bundling.transform(subcontext, subcontext.data, namespace=ns)
+            subcontext.data = subcontext.driver.transform(subcontext, subcontext.data, namespace=ns)
             # update compose targets list.
             exposed_list = subcontext.detector.detect_exposed()
             new_compose_target_list = [c for c in subcontext.detector.detect_compose() if c in exposed_list]
@@ -250,10 +255,12 @@ class Context:
 
 def make_rootcontext(option_scanner):
     config = {"root": True}
-    env = Env(option_scanner)
+    driver = option_scanner.options["driver_class"]()  # xxx
+    env = Env(option_scanner, driver)
     detector = Detector(config)
     resolver = PathResolver(".")
     data = {}
-    return Context(env, detector, resolver, data)
+    ctx = Context(env, detector, resolver, data)
+    return ctx
 
 DEFAULT_PREPROCESSOR = Preprocessor()
