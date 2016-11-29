@@ -8,12 +8,14 @@
    │   ├── cmyk.yaml
    │   └── rgb.yaml
    ├── group
-   │   └── group.yaml
+   │   ├── group.yaml
+   │   ├── numbers.yaml
+   │   └── primitive.yaml
    ├── main.yaml
    ├── swagger-bundler.ini
    └── x.yaml
    
-   2 directories, 6 files
+   2 directories, 8 files
    swagger-bundler bundle main.yaml > generated.yaml
 
 ## swagger-bundler.ini(config file)
@@ -74,13 +76,42 @@ deref/group/group.yaml
 
 .. code-block:: yaml
 
+   x-bundler-concat:
+     - numbers.yaml
+   
    definitions:
      group:
+       name:
+         $ref: "./primitive.yaml#/definitions/name"
+       num:
+         $ref: "#/definitions/num"
+
+
+deref/group/numbers.yaml
+
+.. code-block:: yaml
+
+   definitions:
+     num:
+       type: number
+       enum:
+         - 1
+         - 2
+         - 3
+
+
+deref/group/primitive.yaml
+
+.. code-block:: yaml
+
+   definitions:
+     name:
        type: string
        enum:
          - A
          - B
          - C
+   
 
 
 deref/main.yaml
@@ -104,7 +135,7 @@ deref/x.yaml
 .. code-block:: yaml
 
    x-bundler-compose:
-     - group/group.yaml
+     - group/group.yaml as X
    
    definitions:
      color:
@@ -116,7 +147,18 @@ deref/x.yaml
 .. code-block:: yaml
 
    definitions:
+     num:
+       type: number
+       enum:
+       - 1
+       - 2
+       - 3
      XGroup:
+       name:
+         $ref: '#/definitions/XName'
+       num:
+         $ref: '#/definitions/num'
+     XName:
        type: string
        enum:
        - A

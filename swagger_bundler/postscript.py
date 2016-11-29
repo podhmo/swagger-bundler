@@ -5,6 +5,7 @@ import pprint
 import copy
 from collections import deque
 from collections import OrderedDict
+from . import bundling
 from .langhelpers import titleize, guess_name
 from . import highlight
 
@@ -33,18 +34,18 @@ def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitio
     # path :: (<name>/)*<name>
     # section :: 'definitions' | 'parameters' | 'responses'
 
-    def deref(d, ctx, paths):
+    def deref(d, ctx, hist):
         if "$ref" not in d:
-            return d, paths
+            return d, hist
         try:
             m = separator_rx.search(d["$ref"])
             if m is None:
                 highlight.show_on_warning("invalid ref: {}\n".format(d["$ref"]))
-                return d, paths
+                return d, hist
 
             # plain ref
             if m.start() == 0:
-                return d, paths
+                return d, hist
 
             # with extra path
             path = d["$ref"][:m.start()]
@@ -56,18 +57,18 @@ def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitio
             section_store = subctx.data[section]
             for guessed in guess_name(name, subctx.ns):
                 if guessed in section_store:
-                    paths.append((section, name))
-                    return deref(section_store[guessed], ctx=subctx, paths=paths)
+                    hist.append((section, name, subctx))
+                    return deref(section_store[guessed], ctx=subctx, hist=hist)
             highlight.show_on_warning("not found ref: {}\n".format(d["$ref"]))
-            return d, paths
+            return d, hist
         except (IndexError, ValueError) as e:
             highlight.show_on_warning(str(e))
 
     def on_ref_found(d):
-        data, paths = deref(d, ctx, [])
-        if paths:
+        data, hist = deref(d, ctx, [])
+        if hist:
             original_ref = d.pop("$ref")
-            section, name = paths[-1]
+            section, name, subctx = hist[-1]
 
             d["$ref"] = "#/{}/{}".format(section, name)
             if section not in rootdata:
@@ -86,6 +87,59 @@ def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitio
                     highlight.show_on_warning(msg)
                     d.pop("$ref")
                     d.update(data)
+
+            def merge_properties(d, ctx=None, section=None, name=None):
+                if name and section:
+                    if section in rootdata and name in rootdata[section]:
+                        return
+                if name and "$ref" not in d:
+                    if section not in rootdata:
+                        rootdata[section] = OrderedDict()
+                    rootdata[section][name] = d
+                    LooseDictWalker(on_container=lambda d: merge_properties(d, ctx=ctx)).walk(["$ref"], d)
+                    return
+
+                m = separator_rx.search(d["$ref"])
+                if m is None:
+                    highlight.show_on_warning("invalid ref(merge_properties): {}\n".format(d["$ref"]))
+                    return d, hist
+
+                section = m.group(1)
+                name = d["$ref"][m.end():]
+                if m.start() != 0:
+                    # with extra path
+                    path = d["$ref"][:m.start()]
+                    subctx = ctx.make_subcontext(path)
+                    section_store = subctx.data[section]
+                    for guessed in guess_name(name, subctx.ns):
+                        if guessed in section_store:
+                            merge_properties(section_store[guessed], ctx=subctx, section=section, name=guessed)
+                elif section in rootdata and name in rootdata[section]:
+                    return
+                else:
+                    # plain ref
+                    found = False
+                    section_store = ctx.data[section]
+                    for guessed in guess_name(name, ctx.ns):
+                        if guessed in section_store:
+                            found = True
+                            merge_properties(section_store[guessed], ctx=ctx, section=section, name=guessed)
+                            break
+                    subfiles = ctx.detector.detect_compose()
+                    for subpath in subfiles:
+                        subctx = ctx.make_subcontext(subpath)
+                        if section in subctx.data:
+                            section_store = subctx.data[section]
+                            for guessed in guess_name(name, ctx.ns):
+                                if guessed in section_store:
+                                    found = True
+                                    merge_properties(section_store[guessed], ctx=ctx, section=section, name=guessed)
+                    if not found:
+                        highlight.show_on_warning("xinvalid ref(merge_properties): {}\n".format(d["$ref"]))
+                    return
+
+            # todo: cache
+            LooseDictWalker(on_container=lambda d: merge_properties(d, ctx=subctx)).walk(["$ref"], data)
 
     w = LooseDictWalker(on_container=on_ref_found)
     q = ["$ref"]

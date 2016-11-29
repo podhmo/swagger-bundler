@@ -1,0 +1,8 @@
+definitions:
+  name:
+    type: string
+    enum:
+      - A
+      - B
+      - C
+

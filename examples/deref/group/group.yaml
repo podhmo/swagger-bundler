@@ -1,7 +1,9 @@
+x-bundler-concat:
+  - numbers.yaml
+
 definitions:
   group:
-    type: string
-    enum:
-      - A
-      - B
-      - C
+    name:
+      $ref: "./primitive.yaml#/definitions/name"
+    num:
+      $ref: "#/definitions/num"

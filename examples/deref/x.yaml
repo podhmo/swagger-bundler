@@ -1,5 +1,5 @@
 x-bundler-compose:
-  - group/group.yaml
+  - group/group.yaml as X
 
 definitions:
   color:
