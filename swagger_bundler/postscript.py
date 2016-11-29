@@ -118,13 +118,11 @@ def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitio
                     return
                 else:
                     # plain ref
-                    found = False
                     section_store = ctx.data[section]
                     for guessed in guess_name(name, ctx.ns):
                         if guessed in section_store:
-                            found = True
-                            merge_properties(section_store[guessed], ctx=ctx, section=section, name=guessed)
-                            break
+                            return merge_properties(section_store[guessed], ctx=ctx, section=section, name=guessed)
+
                     subfiles = ctx.detector.detect_compose()
                     for subpath in subfiles:
                         subctx = ctx.make_subcontext(subpath)
@@ -132,10 +130,8 @@ def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitio
                             section_store = subctx.data[section]
                             for guessed in guess_name(name, ctx.ns):
                                 if guessed in section_store:
-                                    found = True
-                                    merge_properties(section_store[guessed], ctx=ctx, section=section, name=guessed)
-                    if not found:
-                        highlight.show_on_warning("xinvalid ref(merge_properties): {}\n".format(d["$ref"]))
+                                    return merge_properties(section_store[guessed], ctx=ctx, section=section, name=guessed)
+                    highlight.show_on_warning("xinvalid ref(merge_properties): {}\n".format(d["$ref"]))
                     return
 
             # todo: cache
