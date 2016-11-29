@@ -40,7 +40,8 @@ class OptionScanner:
         # TODO:: support options
         self.options = {
             "prefixing_targets": set(["definitions", "responses", "parameters"]),
-            "postscript_hook": {}
+            "postscript_hook": {},
+            "driver": None,
         }
 
     def scan(self, data):
@@ -48,30 +49,34 @@ class OptionScanner:
                 for sysname, getname in self.scan_items
                 if getname in data}
 
-    def parse_postscript_section(self, items, here=None):
+    def load_functions(self, items, here=None):
         d = {}
         for k, postscript in items:
             postscript = postscript.strip()
             if postscript and ":" in postscript:
-                module_path, fn_name = postscript.rsplit(":", 2)
-                try:
-                    _, ext = os.path.splitext(module_path)
-                    if ext == ".py":
-                        module = magicalimport.import_from_physical_path(module_path, here=here)
-                    else:
-                        module = importlib.import_module(module_path)
-                    d[k] = getattr(module, fn_name)
-                except (ImportError, AttributeError) as e:
-                    sys.stderr.write("could not import {!r}\n{}\n".format(postscript, e))
+                d[k] = self.load_function(postscript, here=here)
         return d
+
+    def load_function(self, sym, here=None):
+        module_path, fn_name = sym.rsplit(":", 2)
+        try:
+            _, ext = os.path.splitext(module_path)
+            if ext == ".py":
+                module = magicalimport.import_from_physical_path(module_path, here=here)
+            else:
+                module = importlib.import_module(module_path)
+            return getattr(module, fn_name)
+        except (ImportError, AttributeError) as e:
+            sys.stderr.write("could not import {!r}\n{}\n".format(sym, e))
 
     @classmethod
     def from_configparser(cls, parser):
         scanner = cls(tuple(parser.items("special_marker")))
         if parser.has_section("postscript_hook"):
             here = parser["config"]["config_dir"]
-            hooks = scanner.parse_postscript_section(parser.items("postscript_hook"), here=here)
+            hooks = scanner.load_functions(parser.items("postscript_hook"), here=here)
             scanner.options["postscript_hook"] = hooks
+            scanner.options["driver"] = scanner.load_function(parser["DEFAULT"]["driver"], here=here)
         return scanner
 
     @classmethod

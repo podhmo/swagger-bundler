@@ -34,8 +34,7 @@ def _prepare():
 def config(file, init):
     config_path = configuration.pickup_config(os.getcwd(), default=None)
     if init:
-        config_path = config_path or os.path.join(os.getcwd(), configuration.CONFIG_NAME)
-        return configuration.init_config(config_path)
+        return configuration.init_config(".")
     else:
         if config_path is None:
             return _on_config_file_is_not_found()
@@ -60,12 +59,13 @@ def bundle(file, namespace, input, output, watch, no_watch, outfile, log):
 
     def run():
         ctx = _prepare()
+        driver = ctx.options["driver"](ctx)
         with open(file) as rf:
             if outfile:
                 with open(outfile, "w") as wf:
-                    bundling.run(ctx, rf, wf, namespace=namespace)
+                    driver.run(rf, wf, namespace=namespace)
             else:
-                bundling.run(ctx, rf, sys.stdout, namespace=namespace)
+                driver.run(rf, sys.stdout, namespace=namespace)
     if not watch:
         run()
     else:

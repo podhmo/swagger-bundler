@@ -37,7 +37,7 @@ def pickup_config(start_path=None, default=None):
 def init_config(path):
     template = """\
 [DEFAULT]
-
+driver = swagger_bundler.drivers.fileconcat.FileConcatDriver
 [special_marker]
 # todo: gentle description.
 namespace = x-bundler-namespace
@@ -57,6 +57,7 @@ bundle =
 add_namespace =
 validate =
 """
+    path = os.path.join(path, CONFIG_NAME)
     sys.stderr.write("generate {}.\n".format(path))
     sys.stderr.flush()
     with open(path, "w") as wf:
@@ -69,6 +70,8 @@ def load_config(path):
     config.add_section("config")
     config["config"]["config_path"] = path
     config["config"]["config_dir"] = os.path.dirname(path)
+    if "driver" not in config["DEFAULT"]:
+        config["DEFAULT"]["driver"] = "swagger_bundler.drivers:FileConcatDriver"
     return config
 
 
