@@ -8,7 +8,7 @@ from io import StringIO
 
 from jsonschema import validate
 from jsonschema import FormatChecker, ValidationError
-from . import loading
+from .. import loading
 from . import orphancheck
 
 

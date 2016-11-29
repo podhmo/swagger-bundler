@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import re
-from . import highlight
+from .. import highlight
 
 
 def check_orphan_reference(ctx, data, exception_on_fail=False):

@@ -6,7 +6,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 class GenerationgTests(unittest.TestCase):
     def _callFUT(self, ctx, data):
-        from swagger_bundler import orphancheck
+        from swagger_bundler.modifiers import orphancheck
         ctx.options["prefixing_targets"] = ["definitions", "responses", "parameters"]
         return orphancheck.check_orphan_reference(ctx, data, exception_on_fail=True)
 

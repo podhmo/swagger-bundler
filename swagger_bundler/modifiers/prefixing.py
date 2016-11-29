@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*-
 import logging
 from collections import defaultdict
-from . import loading
+from .. import loading
 from .ordering import ordering, make_dict
-from .langhelpers import titleize
+from ..langhelpers import titleize
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import logging
-from . import loading
+from .. import loading
 from .ordering import ordering
 from . import composing
 from . import prefixing

@@ -5,9 +5,9 @@ import logging
 
 from swagger_bundler import make_rootcontext_from_configparser
 from swagger_bundler import config as configuration
-import swagger_bundler.ordering as ordering
-import swagger_bundler.bundling as bundling
-import swagger_bundler.composing as composing
+import swagger_bundler.modifiers.ordering as ordering
+import swagger_bundler.modifiers.bundling as bundling
+import swagger_bundler.modifiers.composing as composing
 import swagger_bundler.loading as loading
 
 

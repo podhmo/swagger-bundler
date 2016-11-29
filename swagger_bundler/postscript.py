@@ -5,7 +5,7 @@ import pprint
 import copy
 from collections import deque
 from collections import OrderedDict
-from . import bundling
+from .modifiers import bundling
 from .langhelpers import titleize, guess_name
 from . import highlight
 
