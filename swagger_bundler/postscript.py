@@ -22,7 +22,7 @@ def echo(ctx, data, *args, **kwargs):
 _rx_cache = {}
 
 
-def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitions", "responses", "parameters"]), **kwargs):
+def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitions", "responses", "parameters", "paths"]), **kwargs):
     cache_k = tuple(targets)
     if cache_k not in _rx_cache:
         _rx_cache[cache_k] = re.compile("#/({})/".format("|".join(targets)))

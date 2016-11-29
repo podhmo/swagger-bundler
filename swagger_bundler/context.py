@@ -39,7 +39,7 @@ class OptionScanner:
 
         # TODO:: support options
         self.options = {
-            "prefixing_targets": set(["definitions", "responses", "parameters"]),
+            "prefixing_targets": set(["definitions", "responses", "parameters", "paths"]),
             "postscript_hook": {}
         }
 
