@@ -17,12 +17,12 @@ def main(ctx_):
     return ctx_.get_help()
 
 
-def _prepare():
+def _prepare(driver_class=None):
     config_path = configuration.pickup_config(os.getcwd()) or "~/.{}".format(configuration.CONFIG_NAME)
     if not os.path.exists(config_path):
         return _on_config_file_is_not_found()
     parser = configuration.load_config(config_path)
-    ctx = make_rootcontext_from_configparser(parser)
+    ctx = make_rootcontext_from_configparser(parser, driver_class=driver_class)
     ordering.setup()
     return ctx
 
@@ -71,6 +71,26 @@ def bundle(file, namespace, input, output, watch, no_watch, outfile, log):
             sys.stderr.write(click.style("--outfile is not set\n", bold=True, fg="yellow"))
         from swagger_bundler.watch import do_watch
         return do_watch(run, path=".", pattern=watch, ignore_pattern=no_watch, outfile=outfile)
+
+
+@main.command(help="migration from older format")
+@click.argument("file", required=True, type=click.Path(exists=True))
+@click.option("--src", required=True)
+@click.option("--dst", required=True)
+@click.option("--dry-run/--force", default=False)
+@click.option("--input", help="input format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
+@click.option("--output", help="output format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
+@click.option("--log/--", help="activate logging(for debug)", default=False)  # TODO: まじめに
+def migrate(file, src, dst, dry_run, input, output, log):
+    loading.setup(output=output, input=input)
+
+    if log:
+        logging.basicConfig(level=logging.DEBUG)
+    from swagger_bundler.drivers import MigrationDriver
+    ctx = _prepare(driver_class=MigrationDriver)
+    with open(file) as rf:
+        ctx.driver.run(ctx, rf, sys.stdout)
+        ctx.driver.emit(ctx, replacer=lambda x: x.replace(src, dst), dry_run=dry_run)
 
 
 @main.command(help="validates via swagger-2.0 spec")

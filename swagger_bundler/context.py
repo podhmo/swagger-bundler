@@ -253,9 +253,10 @@ class Context:
             return self.make_subcontext(port.name, data=data)
 
 
-def make_rootcontext(option_scanner):
+def make_rootcontext(option_scanner, driver_class=None):
     config = {"root": True}
-    driver = option_scanner.options["driver_class"]()  # xxx
+    driver_class = driver_class or option_scanner.options["driver_class"]
+    driver = driver_class()  # xxx
     env = Env(option_scanner, driver)
     detector = Detector(config)
     resolver = PathResolver(".")
