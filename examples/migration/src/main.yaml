@@ -1,0 +1,7 @@
+x-bundler-namespace:
+  ABC
+
+x-bundler-compose:
+  - ./group/x.yaml as X
+  - ./group/y.yaml as Y
+

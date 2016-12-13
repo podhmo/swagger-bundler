@@ -1,0 +1,14 @@
+x-bundler-namespace:
+  y
+
+x-bundler-compose:
+  - ../color/rgb.yaml
+x-bundler-concat:
+  - ../definitions/primitive.yaml
+
+definitions:
+  Y:
+    name:
+      $ref: "#/definitions/name"
+    color:
+      $ref: "#/definitions/color"
