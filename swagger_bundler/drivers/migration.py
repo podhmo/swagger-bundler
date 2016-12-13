@@ -1,10 +1,12 @@
 # -*- coding:utf-8 -*-
 import sys
+import re
 import json
 import logging
 import os.path
 from ..modifiers.ordering import ordering
 from ..walkers import LooseDictWalker
+from .. import highlight
 from .. import loading
 from collections import namedtuple, ChainMap
 logger = logging.getLogger(__name__)
@@ -24,25 +26,44 @@ class MigrationDriver:
     def __init__(self):
         self.refs = {}  # identifier, section -> (ChainMap[name] -> ref position)
         self.arrived = set()
+        self.candidates = ["definitions", "responses", "parameters", "paths"]
+        self.rx = re.compile("#/({})/".format("|".join(self.candidates)))
 
     def migrate_context(self, ctx, pairs):
         logger.debug("@migrate path=%s", ctx.path)
         logger.debug("@@before migration %s", LazyJsonDump(ctx.data))
 
-        for section in ctx.options["prefixing_targets"]:
+        for section in self.candidates:
+            d = {name: ctx.path for name in ctx.data.get(section, [])}
+            self.refs[(ctx.path, section)] = ChainMap(d, *[self.refs.get((p.ctx.path, section)) or {} for p in pairs])
+
+        for section in self.candidates:
             if section not in ctx.data:
                 continue
-
-            d = {name: ctx.path for name in ctx.data[section]}
-            refs = self.refs[(ctx.path, section)] = ChainMap(d, *[self.refs[(p.ctx.path, section)] for p in pairs])
             # print("@@", section, list(d.keys()), "@", list(refs.keys()))
             # print("@@@", [p.ctx.path for p in pairs])
 
             def on_ref(d):
-                prefix, name = d["$ref"].split("#/{}/".format(section), 1)
-                if name in ctx.data[section]:
+                m = self.rx.search(d["$ref"])
+                if m is None:
+                    msg = "  on where={!r}, invalid ref {!r}\n".format(ctx.path, d["$ref"])
+                    highlight.show_on_warning(msg)
                     return
+
+                prefix = m.group(1)
+                name = d["$ref"][m.end():]
+
+                if prefix in ctx.data and name in ctx.data[prefix]:
+                    return
+
+                refs = self.refs[(ctx.path, prefix)]
+
                 # todo: compose
+                if name not in refs:
+                    msg = "  on where={!r}, {!r} is not found\n".format(ctx.path, d["$ref"])
+                    highlight.show_on_warning(msg)
+                    return
+
                 relpath = os.path.relpath(refs[name], start=ctx.path)
                 d["$ref"] = "{}{}".format(relpath, d["$ref"])
 
@@ -67,7 +88,6 @@ class MigrationDriver:
             subctx = self.resolve(ctx, src)
             pairs.append(Pair(ctx=subctx, composed=src not in ctx.detector.detect_exposed()))
         self.migrate_context(ctx, pairs)
-        print("@", data)
         return data
 
     def run(self, ctx, inp, outp):
