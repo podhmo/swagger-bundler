@@ -41,7 +41,7 @@ class OptionScanner:
         # so in yaml file: x-bundler-compose: <compose sourcefile>
         # in program: "compose" as keyword.
         self.scan_items = scan_items
-
+        self.scan_map = dict(scan_items)
         # TODO:: support options
         self.options = {
             "prefixing_targets": set(["definitions", "responses", "parameters"]),
@@ -169,6 +169,9 @@ class Context:
         self.resolver = resolver
         self.data = data
         self.marked = False
+
+    def exact_tagname(self, name):
+        return self.env.option_scanner.scan_map[name]
 
     def is_marked(self):
         return self.marked

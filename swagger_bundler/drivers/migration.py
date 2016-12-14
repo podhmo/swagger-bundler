@@ -4,7 +4,7 @@ import re
 import json
 import logging
 import os.path
-from ..modifiers.ordering import ordering
+from ..modifiers.ordering import ordering, make_dict
 from ..walkers import LooseDictWalker
 from .. import highlight
 from .. import loading
@@ -25,6 +25,7 @@ class LazyJsonDump(object):
 class MigrationDriver:
     def __init__(self):
         self.refs = {}  # identifier, section -> (ChainMap[name] -> ref position)
+        self.allrefs = {}
         self.arrived = set()
         self.candidates = ["definitions", "responses", "parameters", "paths"]
         self.rx = re.compile("#/({})/".format("|".join(self.candidates)))
@@ -35,37 +36,40 @@ class MigrationDriver:
 
         for section in self.candidates:
             d = {name: ctx.path for name in ctx.data.get(section, [])}
+            for k, v in d.items():
+                if k not in self.allrefs:
+                    self.allrefs[k] = v
             self.refs[(ctx.path, section)] = ChainMap(d, *[self.refs.get((p.ctx.path, section)) or {} for p in pairs])
+
+        def on_ref(d):
+            m = self.rx.search(d["$ref"])
+            if m is None:
+                msg = "  on where={!r}, invalid ref {!r}\n".format(ctx.path, d["$ref"])
+                highlight.show_on_warning(msg)
+                return
+
+            prefix = m.group(1)
+            name = d["$ref"][m.end():]
+
+            if prefix in ctx.data and name in ctx.data[prefix]:
+                return
+
+            refs = self.refs[(ctx.path, prefix)]
+
+            # todo: compose
+            if name not in refs:
+                msg = "  on where={!r}, {!r} is not found\n".format(ctx.path, d["$ref"])
+                highlight.show_on_warning(msg)
+                if name in self.allrefs:
+                    highlight.show_on_warning("    maybe file={!r}".format(self.allrefs[name]))
+                return
+
+            relpath = os.path.relpath(refs[name], start=ctx.path)
+            d["$ref"] = "{}{}".format(relpath, d["$ref"])
 
         for section in self.candidates:
             if section not in ctx.data:
                 continue
-            # print("@@", section, list(d.keys()), "@", list(refs.keys()))
-            # print("@@@", [p.ctx.path for p in pairs])
-
-            def on_ref(d):
-                m = self.rx.search(d["$ref"])
-                if m is None:
-                    msg = "  on where={!r}, invalid ref {!r}\n".format(ctx.path, d["$ref"])
-                    highlight.show_on_warning(msg)
-                    return
-
-                prefix = m.group(1)
-                name = d["$ref"][m.end():]
-
-                if prefix in ctx.data and name in ctx.data[prefix]:
-                    return
-
-                refs = self.refs[(ctx.path, prefix)]
-
-                # todo: compose
-                if name not in refs:
-                    msg = "  on where={!r}, {!r} is not found\n".format(ctx.path, d["$ref"])
-                    highlight.show_on_warning(msg)
-                    return
-
-                relpath = os.path.relpath(refs[name], start=ctx.path)
-                d["$ref"] = "{}{}".format(relpath, d["$ref"])
 
             walker = LooseDictWalker(on_container=on_ref)
             walker.walk(["$ref"], ctx.data[section])
@@ -90,9 +94,37 @@ class MigrationDriver:
         self.migrate_context(ctx, pairs)
         return data
 
-    def run(self, ctx, inp, outp):
-        subcontext = ctx.make_subcontext_from_port(inp)
-        self.transform(subcontext, subcontext.data, last=True)
+    def run(self, basectx, inp, outp):
+        ctx = basectx.make_subcontext_from_port(inp)
+        self.transform(ctx, ctx.data, last=True)
+        detector = ctx.detector
+        ns = detector.detect_namespace()
+        squash_map = make_dict()
+        if ns:
+            squash_map[ns] = ns
+        for src in detector.detect_compose():
+            if src in detector.detect_exposed():
+                store = ctx.data
+            else:
+                store = ctx.data
+                if ns:
+                    if ns not in store:
+                        store[ns] = make_dict()
+                        squash_map[ns] = ns
+                    store = store[ns]
+                subctx = ctx.make_subcontext(src)
+                if subctx.ns:
+                    if subctx.ns not in store:
+                        store[subctx.ns] = make_dict()
+                        squash_map[subctx.ns] = subctx.ns
+                    store = store[subctx.ns]
+            k = ctx.exact_tagname("concat")
+            if k not in store:
+                store[k] = []
+            store[k].append(src.split(" ", 1)[0])
+        if ns:
+            ctx.data["x-bundler-squash"] = squash_map
+        return ctx
 
     def emit(self, ctx, replacer, dry_run=False):
         for ctx in ctx.env.pool.values():

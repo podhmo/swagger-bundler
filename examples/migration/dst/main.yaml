@@ -1,1 +1,11 @@
-{}
+ABC:
+  X:
+    x-bundler-concat:
+    - ./group/x.yaml
+  Y:
+    x-bundler-concat:
+    - ./group/y.yaml
+x-bundler-squash:
+  ABC: ABC
+  X: X
+  Y: Y
