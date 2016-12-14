@@ -64,7 +64,7 @@ class MigrationDriver:
                     highlight.show_on_warning("    maybe file={!r}".format(self.allrefs[name]))
                 return
 
-            relpath = os.path.relpath(refs[name], start=ctx.path)
+            relpath = os.path.relpath(refs[name], start=os.path.dirname(ctx.path))
             d["$ref"] = "{}{}".format(relpath, d["$ref"])
 
         for section in self.candidates:
