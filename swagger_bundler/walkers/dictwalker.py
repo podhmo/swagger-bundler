@@ -1,7 +1,7 @@
 from collections import deque
 
 
-class LooseDictWalker:
+class LooseDictWalker(object):
     def __init__(self, on_container=None, on_data=None):
         self.on_container = on_container
         self.on_data = on_data

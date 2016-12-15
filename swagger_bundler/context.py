@@ -73,6 +73,7 @@ class OptionScanner:
             return getattr(module, fn_name)
         except (ImportError, AttributeError) as e:
             sys.stderr.write("could not import {!r}\n{}\n".format(sym, e))
+            raise
 
     @classmethod
     def from_configparser(cls, parser):

@@ -22,7 +22,7 @@ class LazyJsonDump(object):
         return json.dumps(self.data, indent=2, ensure_ascii=False)
 
 
-class MigrationDriver:
+class MigrationDriver(object):
     def __init__(self):
         self.refs = {}  # identifier, section -> (ChainMap[name] -> ref position)
         self.allrefs = {}
@@ -77,7 +77,6 @@ class MigrationDriver:
         logger.debug("@@after migration %s", LazyJsonDump(ctx.data))
 
     def resolve(self, ctx, src):
-        ctx.make_subcontext(src)
         subcontext = ctx.make_subcontext(src)
         self.transform(subcontext, subcontext.data)
         return subcontext
