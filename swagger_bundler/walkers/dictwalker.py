@@ -6,30 +6,45 @@ class LooseDictWalker(object):
         self.on_container = on_container
         self.on_data = on_data
 
-    def on_found(self, d, k):
+    def on_found(self, path, d, k):
         if self.on_container is not None:
-            self.on_container(d)
+            self.on_container(path, d)
         if self.on_data is not None:
-            self.on_data(d[k])
+            self.on_data(path, d[k])
 
-    def walk(self, paths, d):
-        return self._walk(deque(paths), d)
+    def walk(self, qs, d):
+        return self._walk([], deque(qs), d)
 
-    def _walk(self, paths, d):
+    def _walk(self, path, qs, d):
         if hasattr(d, "keys"):
             for k in list(d.keys()):
-                if len(paths) > 0 and paths[0] == k:
-                    name = paths.popleft()
-                    self._walk(paths, d[k])
-                    if len(paths) == 0:
-                        self.on_found(d, k)
-                    paths.appendleft(name)
+                path.append(k)
+                if len(qs) > 0 and qs[0] == k:
+                    q = qs.popleft()
+                    self._walk(path, qs, d[k])
+                    if len(qs) == 0:
+                        self.on_found(path, d, k)
+                    qs.appendleft(q)
                 else:
-                    self._walk(paths, d[k])
+                    self._walk(path, qs, d[k])
+                path.pop()
             return d
         elif isinstance(d, (list, tuple)):
+            path.append("[]")
             for e in d:
-                self._walk(paths, e)
+                self._walk(path, qs, e)
+            path.pop()
             return d
         else:
             return d
+
+
+# TODO: remove
+def LegacyDictWalker(on_container=None, on_data=None):
+    on_container_wrap = on_container
+    if on_container is not None:
+        on_container_wrap = lambda path, d: on_container(d)  # NOQA
+    on_data_wrap = on_data
+    if on_data is not None:
+        on_data_wrap = lambda path, d: on_data(d)  # NOQA
+    return WithPathDictWalker(on_container=on_data_wrap, on_data=on_data_wrap)

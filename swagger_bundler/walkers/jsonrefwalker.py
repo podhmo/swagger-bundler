@@ -26,7 +26,7 @@ class JSONRefWalker(object):
     def at_update_ref(self, d, ref):
         d["$ref"] = ref
 
-    def at_ref(self, ctx, d):
+    def at_ref(self, ctx, path, d):
         ref = d["$ref"]
         print("@ ref", ctx.path, ":", d["$ref"], file=sys.stderr)
         left_and_right = [x.strip("/") for x in ref.split("#", 1)]
