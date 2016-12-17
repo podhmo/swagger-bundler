@@ -4,9 +4,8 @@ ABC:
       X:
         $ref: "./group/x.yaml#/definitions/X"
   Y:
-    definitions:
-      Y:
-        $ref: "./group/y.yaml#/definitions/Y"
+    x-bundler-concat:
+      - ./group/y.yaml
 
 x-bundler-squash:
   ABC: ABC

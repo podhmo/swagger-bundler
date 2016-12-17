@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 import sys  # NOQA
 import json
-from dictknife import Accessor, deepequal
+from dictknife import Accessor, deepequal, deepmerge, LooseDictWalker
 from dictknife.operators import Or
 from dictknife.chain import chain, ChainedContext
 from collections import namedtuple
@@ -97,6 +97,7 @@ class Handler(ChainedContext):  # Renamed. Because it is confusing that swagger_
 class RefResolveDriver(object):
     def __init__(self):
         self.linker = RefResolveLinker(self)
+        self.concat = Concat(self)
 
     def run(self, basectx, inp, outp, namespace=None):
         ctx = basectx.make_subcontext_from_port(inp)
@@ -106,6 +107,7 @@ class RefResolveDriver(object):
 
     def transform(self, ctx, data, namespace=None, last=False):
         self.linker.transform(ctx, data)
+        self.concat.transform(ctx, data)
         return data
 
 
@@ -181,4 +183,27 @@ class RefResolveLinker(object):
                   .chain([Or(markers)], on_container=found_namespace)
                   .chain(["$ref"]))
         walker.walk(data, on_container=found_ref, store_stack=[StoreFrame(path=[], store=data)], ctx=ctx)
+        return data
+
+
+class Concat(object):
+    accessor = Accessor(make_dict=make_dict)
+
+    def __init__(self, driver):
+        self.driver = driver
+
+    def transform(self, ctx, data):
+        concat_marker = ctx.exact_tagname("concat")
+
+        def found_concat(path, d):
+            subfiles = d.pop(concat_marker)
+            additional = make_dict()
+            for src in subfiles:
+                # todo: cache
+                subctx = ctx.make_subcontext(src)
+                additional = deepmerge(additional, self.driver.transform(subctx, subctx.data))
+            d.update(deepmerge(d, additional))
+
+        walker = LooseDictWalker(on_container=found_concat)
+        walker.walk([concat_marker], data)
         return data
