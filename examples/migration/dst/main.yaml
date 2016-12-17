@@ -1,10 +1,13 @@
 ABC:
   X:
-    x-bundler-concat:
-    - ./group/x.yaml
+    definitions:
+      X:
+        $ref: "./group/x.yaml#/definitions/X"
   Y:
-    x-bundler-concat:
-    - ./group/y.yaml
+    definitions:
+      Y:
+        $ref: "./group/y.yaml#/definitions/Y"
+
 x-bundler-squash:
   ABC: ABC
   X: X

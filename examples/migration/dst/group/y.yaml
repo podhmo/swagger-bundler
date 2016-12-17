@@ -1,6 +1,6 @@
 definitions:
   Y:
     name:
-      $ref: ../../definitions/primitive.yaml#/definitions/name
+      $ref: ../definitions/primitive.yaml#/definitions/name
     color:
-      $ref: ../../color/rgb.yaml#/definitions/color
+      $ref: ../color/rgb.yaml#/definitions/color

@@ -5,7 +5,8 @@ import json
 import logging
 import os.path
 from ..modifiers.ordering import ordering, make_dict
-from ..walkers import LooseDictWalker
+from dictknife import LooseDictWalker
+from dictknife.contexts import SimpleContext
 from .. import highlight
 from .. import loading
 from collections import namedtuple, ChainMap
@@ -71,7 +72,7 @@ class MigrationDriver(object):
             if section not in ctx.data:
                 continue
 
-            walker = LooseDictWalker(on_container=on_ref)
+            walker = LooseDictWalker(on_container=on_ref, context_factory=SimpleContext)
             walker.walk(["$ref"], ctx.data[section])
 
         logger.debug("@@after migration %s", LazyJsonDump(ctx.data))
@@ -101,6 +102,7 @@ class MigrationDriver(object):
         squash_map = make_dict()
         if ns:
             squash_map[ns] = ns
+
         for src in detector.detect_compose():
             if src in detector.detect_exposed():
                 store = ctx.data

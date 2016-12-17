@@ -5,9 +5,15 @@ import pprint
 import copy
 from collections import deque
 from collections import OrderedDict
-from .walkers.dictwalker import LegacyDictWalker as LooseDictWalker
 from .langhelpers import titleize, guess_name
 from . import highlight
+from dictknife import LooseDictWalker as NewerLooseDictWalker
+from dictknife.contexts import SimpleContext
+
+
+# backward compatibility
+class LooseDictWalker(NewerLooseDictWalker):
+    context_factory = SimpleContext
 
 
 def loose_dict_walker(paths, d, fn):
@@ -28,6 +34,7 @@ def echo(ctx, data, *args, **kwargs):
 _rx_cache = {}
 
 
+# todo remove
 def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitions", "responses", "parameters", "paths"]), **kwargs):
     cache_k = tuple(targets)
     if cache_k not in _rx_cache:
