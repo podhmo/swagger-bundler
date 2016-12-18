@@ -9,6 +9,15 @@ logger = logging.getLogger(__name__)
 
 
 class FileConcatDriver:
+    def run(self, ctx, inp, outp, namespace=None):
+        subcontext = ctx.make_subcontext_from_port(inp)
+        result = self.transform(subcontext, subcontext.data, namespace=namespace, last=True)
+
+        orphancheck.check_orphan_reference(ctx, result, exception_on_fail=False)
+
+        ordered = ordering(result)
+        loading.dump(ordered, outp)
+
     def transform(self, ctx, data, namespace=None, last=False):
         subfiles = ctx.detector.detect_compose()
         if subfiles:
@@ -25,12 +34,3 @@ class FileConcatDriver:
             if postscript_result is not None:
                 data = postscript_result
         return data
-
-    def run(self, ctx, inp, outp, namespace=None):
-        subcontext = ctx.make_subcontext_from_port(inp)
-        result = self.transform(subcontext, subcontext.data, namespace=namespace, last=True)
-
-        orphancheck.check_orphan_reference(ctx, result, exception_on_fail=False)
-
-        ordered = ordering(result)
-        loading.dump(ordered, outp)

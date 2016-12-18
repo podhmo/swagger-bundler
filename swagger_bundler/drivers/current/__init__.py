@@ -44,4 +44,10 @@ class RefResolveDriver(object):
     def transform(self, ctx, data, namespace=None, last=False):
         self.linker.transform(ctx, data)
         self.concat.transform(ctx, data)
+        # TODO: handling code
+        postscript = ctx.options["postscript_hook"].get("bundle")
+        if postscript and callable(postscript):
+            postscript_result = postscript(ctx, data, namespace=namespace, last=last)
+            if postscript_result is not None:
+                data = postscript_result
         return data
