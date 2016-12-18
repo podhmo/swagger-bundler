@@ -7,9 +7,9 @@ import os.path
 from collections import namedtuple, ChainMap
 from dictknife import LooseDictWalker
 from dictknife.contexts import SimpleContext
-from ...modifiers.ordering import ordering, make_dict
-from ... import highlight
-from ... import loading
+from ..modifiers.ordering import ordering, make_dict
+from .. import highlight
+from .. import loading
 logger = logging.getLogger(__name__)
 
 

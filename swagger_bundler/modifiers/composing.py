@@ -1,42 +1,14 @@
 # -*- coding:utf-8 -*-
 import logging
-from .. import loading
-from .ordering import ordering, make_dict
+from dictknife import deepmerge
+from .ordering import make_dict
 logger = logging.getLogger(__name__)
-
-
-def _merged(left, right):
-    if isinstance(left, list):
-        r = left[:]
-        if isinstance(right, (list, tuple)):
-            for e in right:
-                if e not in r:
-                    r.append(e)
-        else:
-            if right not in r:
-                r.append(right)
-        return r
-    elif hasattr(left, "get"):
-        if hasattr(right, "get"):
-            r = left.copy()
-            for k in right.keys():
-                if k in left:
-                    r[k] = _merged(r[k], right[k])
-                else:
-                    r[k] = right[k]
-            return r
-        elif right is None:
-            return left
-        else:
-            raise ValueError("cannot merge dict and non-dict: left=%s, right=%s", left, right)
-    else:
-        return right
 
 
 def merged(left, right):
     # import json
     # logger.debug("**merge: %s @@@@ %s**", json.dumps(left, indent=2), json.dumps(right, indent=2))
-    result = _merged(left, right)
+    result = deepmerge(left, right)
     # logger.debug("****merge result: %s****", json.dumps(result, indent=2))
     return result
 
@@ -63,9 +35,3 @@ def transform(ctx, fulldata, files, last=False):
         if postscript_result is not None:
             result = postscript_result
     return result
-
-
-def run(ctx, files, outp):
-    result = transform(ctx, make_dict(), files, last=True)
-    ordered = ordering(result)
-    loading.dump(ordered, outp)

@@ -2,12 +2,9 @@ import sys
 import os.path
 import click
 import logging
-
-from swagger_bundler import make_rootcontext_from_configparser
-from swagger_bundler import config as configuration
-import swagger_bundler.modifiers.ordering as ordering
-import swagger_bundler.modifiers.composing as composing
+import swagger_bundler.config as configuration
 import swagger_bundler.loading as loading
+from swagger_bundler.drivers.concat import run as concat_run
 
 
 @click.group()
@@ -15,16 +12,6 @@ import swagger_bundler.loading as loading
 def main(ctx_):
     # ctx_ is click's context. not swagger_bundler.context.Context.
     return ctx_.get_help()
-
-
-def _prepare(driver_class=None):
-    config_path = configuration.pickup_config(os.getcwd()) or "~/.{}".format(configuration.CONFIG_NAME)
-    if not os.path.exists(config_path):
-        return _on_config_file_is_not_found()
-    parser = configuration.load_config(config_path)
-    ctx = make_rootcontext_from_configparser(parser, driver_class=driver_class)
-    ordering.setup()
-    return ctx
 
 
 @main.command(help="show config")
@@ -36,7 +23,7 @@ def config(file, init):
         return configuration.init_config(".")
     else:
         if config_path is None:
-            return _on_config_file_is_not_found()
+            return configuration.exit_config_file_is_not_found()
         config = configuration.load_config(config_path)
         return configuration.describe_config(config, sys.stdout)
 
@@ -57,7 +44,7 @@ def bundle(file, namespace, input, output, watch, no_watch, outfile, log):
         logging.basicConfig(level=logging.DEBUG)
 
     def run():
-        ctx = _prepare()
+        ctx = configuration.setup()
         with open(file) as rf:
             if outfile:
                 with open(outfile, "w") as wf:
@@ -87,7 +74,7 @@ def migrate(file, src, dst, dry_run, input, output, log):
     if log:
         logging.basicConfig(level=logging.DEBUG)
     from swagger_bundler.drivers import MigrationDriver
-    ctx = _prepare(driver_class=MigrationDriver)
+    ctx = configuration.setup(driver_class=MigrationDriver)
     with open(file) as rf:
         ctx.driver.run(ctx, rf, sys.stdout)
         ctx.driver.emit(ctx, replacer=lambda x: x.replace(src, dst), dry_run=dry_run)
@@ -98,7 +85,7 @@ def migrate(file, src, dst, dry_run, input, output, log):
 def validate(file):
     import swagger_bundler.validation as validation
     with open(file) as rf:
-        ctx = _prepare()
+        ctx = configuration.setup()
         validation.run(ctx, rf, sys.stdout)
 
 
@@ -107,15 +94,9 @@ def validate(file):
 @click.option("--input", help="input format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
 @click.option("--output", help="output format", type=click.Choice([loading.Format.yaml, loading.Format.json]))
 def concat(files, input, output):
-    ctx = _prepare()
+    ctx = configuration.setup()
     loading.setup(output=output, input=input)
-    composing.run(ctx, files, sys.stdout)
-
-
-def _on_config_file_is_not_found():
-    sys.stderr.write("config file not found:\nplease run `swagger-bundler config --init`\n")
-    sys.stderr.flush()
-    sys.exit(-1)
+    concat_run(ctx, files, sys.stdout)
 
 
 if __name__ == "__main__":
