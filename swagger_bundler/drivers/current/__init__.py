@@ -3,10 +3,10 @@ import sys  # NOQA
 from ... import loading
 from ...modifiers.ordering import ordering
 from ...modifiers import orphancheck
-from .modifierreflink import RefResolveLinker
-from .modifierconcat import Concat
-from .modifiercommondefmerger import CommonDefinitionMerger
-from .modifiersquasher import NamespaceSquasher
+from .linker import RefResolveLinker
+from .concat import Concat
+from .merger import CommonDefinitionMerger
+from .squasher import NamespaceSquasher
 
 
 class RefResolveDriver(object):
