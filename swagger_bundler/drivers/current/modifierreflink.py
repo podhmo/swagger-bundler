@@ -11,6 +11,22 @@ from ...modifiers.ordering import make_dict
 StoreFrame = namedtuple("StoreFrame", "path store")
 
 
+"""
+json reference examples
+
+# extra ref :: <path>#/<namespace>*<section>/<name>
+# path :: (<name>/)*<name>
+# namespace :: (<name>/)*
+# section :: 'definitions' | 'parameters' | 'responses'
+
+examples
+
+- "#/foo/bar"
+- "./#foo/bar"
+- "/foo/bar/#foo/bar"
+"""
+
+
 class RefResolveLinker(object):
     accessor = Accessor(make_dict=make_dict)
 
