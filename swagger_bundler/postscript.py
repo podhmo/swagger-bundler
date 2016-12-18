@@ -5,8 +5,7 @@ import pprint
 import copy
 from collections import deque
 from collections import OrderedDict
-from .langhelpers import titleize, guess_name
-from . import highlight
+from .langhelpers import titleize, guess_name, highlight
 from dictknife import LooseDictWalker as NewerLooseDictWalker
 from dictknife.contexts import SimpleContext
 
@@ -52,7 +51,7 @@ def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitio
         try:
             m = separator_rx.search(d["$ref"])
             if m is None:
-                highlight.show_on_warning("invalid ref: {}\n".format(d["$ref"]))
+                highlight("invalid ref: {}\n".format(d["$ref"]))
                 return d, hist
 
             # plain ref
@@ -71,10 +70,10 @@ def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitio
                 if guessed in section_store:
                     hist.append((section, name, subctx))
                     return deref(section_store[guessed], ctx=subctx, hist=hist)
-            highlight.show_on_warning("not found ref: {}\n".format(d["$ref"]))
+            highlight("not found ref: {}\n".format(d["$ref"]))
             return d, hist
         except (IndexError, ValueError) as e:
-            highlight.show_on_warning(str(e))
+            highlight(str(e))
 
     def on_ref_found(d):
         data, hist = deref(d, ctx, [])
@@ -96,7 +95,7 @@ def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitio
                 if rootdata[section][name] != data:
                     d["x-conflicted"] = original_ref
                     msg = "{} is conflicted. (where file={!r} ref={!r})".format(refpath, ctx.path, original_ref)
-                    highlight.show_on_warning(msg)
+                    highlight(msg)
                     d.pop("$ref")
                     d.update(data)
 
@@ -113,7 +112,7 @@ def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitio
 
                 m = separator_rx.search(d["$ref"])
                 if m is None:
-                    highlight.show_on_warning("invalid ref(merge_properties): {}\n".format(d["$ref"]))
+                    highlight("invalid ref(merge_properties): {}\n".format(d["$ref"]))
                     return d, hist
 
                 section = m.group(1)
@@ -143,7 +142,7 @@ def deref_support_for_extra_file(ctx, rootdata, *args, targets=tuple(["definitio
                             for guessed in guess_name(name, ctx.ns):
                                 if guessed in section_store:
                                     return merge_properties(section_store[guessed], ctx=ctx, section=section, name=guessed)
-                    highlight.show_on_warning("xinvalid ref(merge_properties): {}\n".format(d["$ref"]))
+                    highlight("xinvalid ref(merge_properties): {}\n".format(d["$ref"]))
                     return
 
             # todo: cache

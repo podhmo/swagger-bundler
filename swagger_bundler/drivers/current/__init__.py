@@ -5,7 +5,7 @@ from dictknife import Accessor, deepequal, deepmerge, LooseDictWalker
 from dictknife.operators import Or
 from dictknife.chain import chain, ChainedContext
 from collections import namedtuple
-from ... import highlight
+from ...langhelpers import highlight
 from ... import loading
 from ...modifiers.ordering import make_dict
 from ...modifiers.ordering import ordering
@@ -130,7 +130,7 @@ class RefResolveLinker(object):
             d = self.accessor.maybe_access_container(subctx.data, refspec.ref_path)
             if d is None:
                 msg = "  on where={!r}, ref {!r} is not found\n".format(subctx.path, refspec.ref)
-                highlight.show_on_warning(msg)
+                highlight(msg)
                 return refspec.ref
             k = refspec.ref_path[-1]
 
@@ -149,11 +149,11 @@ class RefResolveLinker(object):
                 elif not deepequal(container[k], d[k]):
                     # print("@@@@@ merge", subctx.path)
                     msg = "  on where={!r}, ref {!r} is conflicted with {!r}\n".format(subctx.path, refspec.ref, ctx.path)
-                    highlight.show_on_warning(msg)
+                    highlight(msg)
                     msg = "    {!r}: {!r}".format(ctx.path, json.dumps(container[k]))
-                    highlight.show_on_warning(msg)
+                    highlight(msg)
                     msg = "    {!r}: {!r}".format(subctx.path, json.dumps(d[k]))
-                    highlight.show_on_warning(msg)
+                    highlight(msg)
                 walker.walk(["$ref"], d[k], ctx=h.new_child(ctx=subctx))  # xxx
             return "/".join(["#", *refspec.ref_path])
 
@@ -170,7 +170,7 @@ class RefResolveLinker(object):
             refspec = h.detect_refspec(d["$ref"])
             if refspec.is_broken():
                 msg = "  on where={!r}, invalid ref {!r}\n".format(ctx.path, refspec.ref)
-                highlight.show_on_warning(msg)
+                highlight(msg)
                 return refspec.ref
             elif refspec.is_external():
                 d["$ref"] = on_external(h.ctx, h, walker, refspec)

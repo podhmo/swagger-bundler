@@ -2,7 +2,7 @@ import sys
 import time
 import logging
 import os.path
-from . import highlight
+from .langhelpers import highlight
 logger = logging.getLogger(__name__)
 
 
@@ -17,7 +17,7 @@ def do_watch(fn, path, pattern, ignore_pattern=None, outfile=None):
 watch dog is not found.
 please run `pip install "swagger_bundler[watch]`
         """
-        highlight.show_on_warning(msg)
+        highlight(msg)
         sys.exit(1)
 
     class _CallbackHandler(PatternMatchingEventHandler):

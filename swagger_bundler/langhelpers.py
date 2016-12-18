@@ -1,4 +1,15 @@
 # -*- coding:utf-8 -*-
+import click
+import sys
+import logging
+
+
+def highlight(msg, logger=logging.getLogger("highlight")):
+    sys.stderr.write(click.style(msg.rstrip("\n"), bold=True, fg="yellow"))
+    sys.stderr.write("\n")
+    logger.info(msg)
+
+
 def titleize(s):
     """fooBar -> FooBar"""
     if not s:

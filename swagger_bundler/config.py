@@ -3,7 +3,7 @@ import sys
 import os.path
 import configparser
 from collections import OrderedDict
-from . import context
+from .core import make_rootcontext, OptionScanner
 from .modifiers import ordering
 
 
@@ -96,8 +96,8 @@ def setup(driver_class=None):
 
 
 def make_rootcontext_from_configparser(parser, driver_class=None):
-    option_scanner = context.OptionScanner.from_configparser(parser)
-    return context.make_rootcontext(option_scanner, driver_class=driver_class)
+    option_scanner = OptionScanner.from_configparser(parser)
+    return make_rootcontext(option_scanner, driver_class=driver_class)
 
 
 def exit_config_file_is_not_found():

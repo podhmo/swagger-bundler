@@ -8,7 +8,7 @@ from collections import namedtuple, ChainMap
 from dictknife import LooseDictWalker
 from dictknife.contexts import SimpleContext
 from ..modifiers.ordering import ordering, make_dict
-from .. import highlight
+from ..langhelpers import highlight
 from .. import loading
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class MigrationDriver(object):
             m = self.rx.search(d["$ref"])
             if m is None:
                 msg = "  on where={!r}, invalid ref {!r}\n".format(ctx.path, d["$ref"])
-                highlight.show_on_warning(msg)
+                highlight(msg)
                 return
 
             prefix = m.group(1)
@@ -61,9 +61,9 @@ class MigrationDriver(object):
             # todo: compose
             if name not in refs:
                 msg = "  on where={!r}, {!r} is not found\n".format(ctx.path, d["$ref"])
-                highlight.show_on_warning(msg)
+                highlight(msg)
                 if name in self.allrefs:
-                    highlight.show_on_warning("    maybe file={!r}".format(self.allrefs[name]))
+                    highlight("    maybe file={!r}".format(self.allrefs[name]))
                 return
 
             relpath = os.path.relpath(refs[name], start=os.path.dirname(ctx.path))

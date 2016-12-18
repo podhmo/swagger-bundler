@@ -2,7 +2,7 @@
 import sys
 import logging
 from .. import loading
-from .. import highlight
+from ..langhelpers import highlight
 logger = logging.getLogger(__name__)
 
 
@@ -47,7 +47,7 @@ class Context:
         if e is not None:
             sys.stderr.write("{}: {}\n".format(type(e), e))
         msg = "  on where={!r}, open={!r}\n".format(self.path, src)
-        highlight.show_on_warning(msg)
+        highlight(msg)
         sys.stderr.flush()
 
     def make_subcontext(self, src, data=None):

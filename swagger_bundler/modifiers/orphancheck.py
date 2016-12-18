@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import re
-from .. import highlight
+from ..langhelpers import highlight
 
 
 def check_orphan_reference(ctx, data, exception_on_fail=False):
@@ -34,7 +34,7 @@ def check_orphan_reference(ctx, data, exception_on_fail=False):
         msg = "{} is not found.".format(ref)
         orphans.append(ref)
         if not exception_on_fail:
-            highlight.show_on_warning(msg)
+            highlight(msg)
 
     collect_refs(data)
     for ref in refs:
