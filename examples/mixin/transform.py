@@ -1,4 +1,4 @@
-from swagger_bundler import highlight
+from swagger_bundler.langhelpers import highlight
 from swagger_bundler.postscript import LooseDictWalker
 
 
@@ -12,7 +12,7 @@ def activate_mixin(ctx, data, marker="x-bundler-mixin", pop_path_list=["x-bundle
             path_list = [path_list]
         for path in path_list:
             if not path.startswith("#"):
-                highlight.show_on_warning("mixin: path={!r} is not found".format(path))
+                highlight("mixin: path={!r} is not found".format(path))
                 continue
             target = data
             for name in path.lstrip("#").split("/"):
