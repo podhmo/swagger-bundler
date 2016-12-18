@@ -25,10 +25,10 @@ class RefResolveDriver(object):
     def transform(self, ctx, data, namespace=None, last=False):
         self.linker.transform(ctx, data)
         self.concat.transform(ctx, data)
-        if last:
-            self.merger.transform(ctx, data)
-            self.squasher.transform(ctx, data)
-            orphancheck.check_orphan_reference(ctx, data, exception_on_fail=False)
+        # if last:
+        #     self.merger.transform(ctx, data)
+        #     self.squasher.transform(ctx, data)
+        #     orphancheck.check_orphan_reference(ctx, data, exception_on_fail=False)
         #     # todo: ref-fixer
 
         # TODO: handling code

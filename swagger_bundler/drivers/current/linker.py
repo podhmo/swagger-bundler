@@ -36,6 +36,7 @@ class RefResolveLinker(object):
     def transform(self, ctx, data):
         def found_namespace(h, walker, d):
             if "$ref" in d:
+                h.store_stack = h.store_stack[:1]
                 found_ref(h, walker, d)
             else:
                 path = h.path[:-1]
