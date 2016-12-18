@@ -11,8 +11,8 @@ class OrphanCheckTests(unittest.TestCase):
         return orphancheck.check_orphan_reference(ctx, data, exception_on_fail=True)
 
     def _makeRootContext(self):
-        from swagger_bundler.context import make_rootcontext
-        from swagger_bundler.context import OptionScanner
+        from swagger_bundler.core import make_rootcontext
+        from swagger_bundler.core import OptionScanner
         from swagger_bundler.drivers import FileConcatDriver
         # [(sysname, getname),...]
         scan_items = [

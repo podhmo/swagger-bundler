@@ -6,6 +6,7 @@ from collections import OrderedDict
 from . import context
 from .modifiers import ordering
 
+
 CONFIG_NAME = "swagger-bundler.ini"
 
 
@@ -87,7 +88,7 @@ def describe_config(config, outp):
 def setup(driver_class=None):
     config_path = pickup_config(os.getcwd()) or "~/.{}".format(CONFIG_NAME)
     if not os.path.exists(config_path):
-        return _on_config_file_is_not_found()
+        return exit_config_file_is_not_found()
     parser = load_config(config_path)
     ctx = make_rootcontext_from_configparser(parser, driver_class=driver_class)
     ordering.setup()

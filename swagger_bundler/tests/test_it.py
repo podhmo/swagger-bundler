@@ -10,8 +10,8 @@ class GenerationgTests(unittest.TestCase):
         return subcontext.driver.transform(subcontext, *args, **kwargs)
 
     def _makeRootContext(self):
-        from swagger_bundler.context import make_rootcontext
-        from swagger_bundler.context import OptionScanner
+        from swagger_bundler.core import make_rootcontext
+        from swagger_bundler.core import OptionScanner
         from swagger_bundler.drivers import FileConcatDriver
         # [(sysname, getname),...]
         scan_items = [
