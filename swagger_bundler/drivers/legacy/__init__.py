@@ -1,10 +1,10 @@
 # -*- coding:utf-8 -*-
 import logging
-from ..modifiers import composing
-from ..modifiers import prefixing
-from ..modifiers.ordering import ordering
-from ..modifiers import orphancheck
-from .. import loading
+from ...modifiers import composing
+from ...modifiers.ordering import ordering
+from ...modifiers import orphancheck
+from . import prefixing
+from ... import loading
 logger = logging.getLogger(__name__)
 
 

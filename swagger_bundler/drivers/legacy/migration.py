@@ -4,13 +4,14 @@ import re
 import json
 import logging
 import os.path
-from ..modifiers.ordering import ordering, make_dict
+from collections import namedtuple, ChainMap
 from dictknife import LooseDictWalker
 from dictknife.contexts import SimpleContext
-from .. import highlight
-from .. import loading
-from collections import namedtuple, ChainMap
+from ...modifiers.ordering import ordering, make_dict
+from ... import highlight
+from ... import loading
 logger = logging.getLogger(__name__)
+
 
 Pair = namedtuple("Pair", "ctx, composed")
 

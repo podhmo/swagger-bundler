@@ -5,10 +5,10 @@ from dictknife import Accessor, deepequal, deepmerge, LooseDictWalker
 from dictknife.operators import Or
 from dictknife.chain import chain, ChainedContext
 from collections import namedtuple
-from .. import highlight
-from .. import loading
-from ..modifiers.ordering import make_dict
-from ..modifiers.ordering import ordering
+from ... import highlight
+from ... import loading
+from ...modifiers.ordering import make_dict
+from ...modifiers.ordering import ordering
 
 
 """

@@ -1,9 +1,8 @@
 # -*- coding:utf-8 -*-
 import logging
 from collections import defaultdict
-from .. import loading
-from .ordering import ordering, make_dict
-from ..langhelpers import titleize
+from ...modifiers.ordering import make_dict
+from ...langhelpers import titleize
 
 logger = logging.getLogger(__name__)
 
@@ -111,11 +110,3 @@ def transform(ctx, data, namespace=None, last=False):
         if postscript_result is not None:
             result = postscript_result
     return result
-
-
-def run(ctx, inp, outp, namespace=None):
-    subcontext = ctx.make_subcontext_from_port(inp)
-    namespace = namespace or subcontext.detector.detect_name()
-    result = transform(subcontext, subcontext.data, namespace=namespace, last=True)
-    ordered = ordering(result)
-    loading.dump(ordered, outp)
