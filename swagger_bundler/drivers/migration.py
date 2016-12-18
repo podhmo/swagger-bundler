@@ -124,8 +124,8 @@ class MigrationDriver(object):
             if k not in store:
                 store[k] = []
             store[k].append(src.split(" ", 1)[0])
-        if ns:
-            ctx.data["x-bundler-squash"] = squash_map
+        # if ns:
+        #     ctx.data["x-bundler-squash"] = squash_map
         return ctx
 
     def emit(self, ctx, replacer, dry_run=False):
