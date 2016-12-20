@@ -32,9 +32,10 @@ class MigrationDriver(object):
         self.candidates = ["definitions", "responses", "parameters", "paths"]
         self.rx = re.compile("#/({})/".format("|".join(self.candidates)))
 
-    def migrate_context(self, ctx, pairs):
+    def migrate_context(self, ctx, pairs, namespace):
         logger.debug("@migrate path=%s", ctx.path)
         logger.debug("@@before migration %s", LazyJsonDump(ctx.data))
+        composed_map = {p.ctx.path: p.composed for p in pairs}
 
         for section in self.candidates:
             d = {name: ctx.path for name in ctx.data.get(section, [])}
@@ -68,6 +69,11 @@ class MigrationDriver(object):
 
             relpath = os.path.relpath(refs[name], start=os.path.dirname(ctx.path))
             d["$ref"] = "{}{}".format(relpath, d["$ref"])
+            composed = composed_map.get(refs[name])
+            if composed and "/paths/" not in d["$ref"]:
+                d["$ref"] = d["$ref"].replace("#/", "#/{}/".format(namespace))
+            if composed is None:
+                highlight("  hmm. on where={!r}, {!r} is not found\n".format(ctx.path, d["$ref"]))
 
         for section in self.candidates:
             if section not in ctx.data:
@@ -78,10 +84,25 @@ class MigrationDriver(object):
 
         logger.debug("@@after migration %s", LazyJsonDump(ctx.data))
 
-    def resolve(self, ctx, src):
+    def resolve(self, ctx, src, namespace):
         subcontext = ctx.make_subcontext(src)
-        self.transform(subcontext, subcontext.data)
+        self.transform(subcontext, subcontext.data, namespace=namespace)
         return subcontext
+
+    def wrap_namespace(self, subctx, ns):
+        subctx.data[ns] = make_dict()
+        for section in self.candidates:
+            if section == "paths":
+                continue
+            if section not in subctx.data:
+                continue
+            subctx.data[ns][section] = subctx.data.pop(section)
+
+        def on_ref(d):
+            if d["$ref"].startswith("#/") and not d["$ref"].startswith("#/paths"):
+                d["$ref"] = d["$ref"].replace("#/", "#/{}/".format(ns))
+        walker = LooseDictWalker(on_container=on_ref, context_factory=SimpleContext)
+        walker.walk(["$ref"], subctx.data)
 
     def transform(self, ctx, data, namespace=None, last=False):
         if ctx.path in self.arrived:
@@ -90,36 +111,39 @@ class MigrationDriver(object):
         subfiles = ctx.detector.detect_compose()
         pairs = []
         for src in subfiles:
-            subctx = self.resolve(ctx, src)
+            subctx = self.resolve(ctx, src, namespace)
             pairs.append(Pair(ctx=subctx, composed=src not in ctx.detector.detect_exposed()))
-        self.migrate_context(ctx, pairs)
+            if pairs[-1].composed:
+                self.wrap_namespace(subctx, namespace)
+        self.migrate_context(ctx, pairs, namespace)
         return data
 
     def run(self, basectx, inp, outp):
         ctx = basectx.make_subcontext_from_port(inp)
-        self.transform(ctx, ctx.data, last=True)
         detector = ctx.detector
         ns = detector.detect_namespace()
+        self.transform(ctx, ctx.data, last=True, namespace=ns)
         squash_map = make_dict()
         if ns:
             squash_map[ns] = ns
 
         for src in detector.detect_compose():
-            if src in detector.detect_exposed():
-                store = ctx.data
-            else:
-                store = ctx.data
-                if ns:
-                    if ns not in store:
-                        store[ns] = make_dict()
-                        squash_map[ns] = ns
-                    store = store[ns]
-                subctx = ctx.make_subcontext(src)
-                if subctx.ns:
-                    if subctx.ns not in store:
-                        store[subctx.ns] = make_dict()
-                        squash_map[subctx.ns] = subctx.ns
-                    store = store[subctx.ns]
+            store = ctx.data
+            # if src in detector.detect_exposed():
+            #     store = ctx.data
+            # else:
+            #     store = ctx.data
+            #     if ns:
+            #         if ns not in store:
+            #             store[ns] = make_dict()
+            #             squash_map[ns] = ns
+            #         store = store[ns]
+            #     subctx = ctx.make_subcontext(src)
+            #     if subctx.ns:
+            #         if subctx.ns not in store:
+            #             store[subctx.ns] = make_dict()
+            #             squash_map[subctx.ns] = subctx.ns
+            #         store = store[subctx.ns]
             k = ctx.exact_tagname("concat")
             if k not in store:
                 store[k] = []
