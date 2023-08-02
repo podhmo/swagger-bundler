@@ -41,7 +41,7 @@ def load(fp, format=None, fn_map={Format.yaml: yaml.load, Format.json: _json_loa
     else:
         fname = getattr(fp, "name", "(unknown)")
         loader = dispatch_by_format(fname, fn_map, default=loading_config.input_format)
-    return loader(fp)
+    return loader(fp, yaml.SafeLoader)
 
 
 def dump(d, fp, format=None, fn_map={Format.yaml: _yaml_dump, Format.json: _json_dump, Format.unknown: _yaml_dump}):
