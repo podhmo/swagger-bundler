@@ -29,7 +29,7 @@ class GenerationgTests(unittest.TestCase):
             subcontext = ctx.make_subcontext_from_port(rf)
             result = self._callFUT(subcontext, subcontext.data)
         with open(os.path.join(here, "data/xproduct.yaml")) as rf:
-            expected = yaml.load(rf)
+            expected = yaml.load(rf, yaml.SafeLoader)
         self.assertEqual(result, expected)
 
     def test_it__duplicated_import(self):
@@ -42,7 +42,7 @@ class GenerationgTests(unittest.TestCase):
             subcontext = ctx.make_subcontext_from_port(rf)
             result = self._callFUT(subcontext, subcontext.data)
         with open(os.path.join(here, "data/yuser.yaml")) as rf:
-            expected = yaml.load(rf)
+            expected = yaml.load(rf, yaml.SafeLoader)
         self.assertEqual(result, expected)
 
     def test_it__exposed(self):
@@ -54,7 +54,7 @@ class GenerationgTests(unittest.TestCase):
             subcontext = ctx.make_subcontext_from_port(rf)
             result = self._callFUT(subcontext, subcontext.data)
         with open(os.path.join(here, "data/zgroup.yaml")) as rf:
-            expected = yaml.load(rf)
+            expected = yaml.load(rf, yaml.SafeLoader)
         self.assertEqual(result, expected)
 
     def test_it__recursive_information(self):
@@ -66,7 +66,7 @@ class GenerationgTests(unittest.TestCase):
             subcontext = ctx.make_subcontext_from_port(rf)
             result = self._callFUT(subcontext, subcontext.data)
         with open(os.path.join(here, "data/gugroup-user.yaml")) as rf:
-            expected = yaml.load(rf)
+            expected = yaml.load(rf, yaml.SafeLoader)
         self.assertEqual(result, expected)
 
     def test_it__qualified_Import(self):
@@ -78,5 +78,5 @@ class GenerationgTests(unittest.TestCase):
             subcontext = ctx.make_subcontext_from_port(rf)
             result = self._callFUT(subcontext, subcontext.data)
         with open(os.path.join(here, "data/ouse-state.yaml")) as rf:
-            expected = yaml.load(rf)
+            expected = yaml.load(rf, yaml.SafeLoader)
         self.assertEqual(result, expected)
